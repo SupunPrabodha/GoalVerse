@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { Text, View } from "react-native";
 
 export default function Index() {
@@ -10,6 +11,10 @@ export default function Index() {
       }}
     >
       <Text>Bruhh! This is sick!!!</Text>
+
+      <Link href="/(auth)">Login page</Link>
+      <Link href="(auth)/signup">signup page</Link>
+      
     </View>
   );
 }
