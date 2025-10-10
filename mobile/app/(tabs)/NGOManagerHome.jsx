@@ -16,6 +16,8 @@ export default function NGOManagerHome() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dashboard, setDashboard] = useState(null);
+  const [evidence, setEvidence] = useState([]);
 
   useEffect(() => {
     let mounted = true;
@@ -32,14 +34,20 @@ export default function NGOManagerHome() {
         if (!mounted) return;
         setUser(u);
 
-        // fetch NGO profile if manager
+        // fetch NGO profile and dashboard if manager
         if (u?.role === "NGO_MANAGER" && token) {
           try {
-            const { data } = await api.get("/ngo/me", authHeaders(token));
+            const [profileRes, dashRes, evidenceRes] = await Promise.all([
+              api.get("/ngo/me", authHeaders(token)),
+              api.get("/ngo/dashboard", authHeaders(token)),
+              api.get("/ngo/evidence?limit=10", authHeaders(token)),
+            ]);
             if (!mounted) return;
-            setProfile(data.profile || null);
+            setProfile(profileRes.data.profile || null);
+            setDashboard(dashRes.data || null);
+            setEvidence(evidenceRes.data.items || []);
           } catch (e) {
-            // ignore profile error
+            // ignore profile/dashboard error
           }
         }
       } catch (e) {
@@ -66,10 +74,9 @@ export default function NGOManagerHome() {
       (API_BASE_URL.replace(/\/api\/?$/, "") + profile.organization_logo)
     : null;
 
-  // Sample metrics (replace with real API data later)
-  const budgetUtil = 0.72;
-  const partnerships = 1;
-  const reportsDue = 2;
+  const budgetUtil = dashboard ? dashboard.budgetUtilizationPercent / 100 : 0;
+  const partnerships = dashboard ? dashboard.partnershipsCount : 0;
+  const reportsDue = dashboard ? dashboard.reportsDueCount : 0;
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={{ padding: 16, paddingBottom: 48 }}>
@@ -91,8 +98,8 @@ export default function NGOManagerHome() {
       <View style={styles.statRow}>
         <View style={[styles.statCard, { backgroundColor: "#ECFDF5" }]}>
           <Text style={styles.statLabel}>Budget Utilization</Text>
-          <Text style={styles.statValue}>72%</Text>
-          <Text style={styles.statSmall}>$720K of $1M used</Text>
+          <Text style={styles.statValue}>{dashboard ? `${dashboard.budgetUtilizationPercent}%` : "--"}</Text>
+          <Text style={styles.statSmall}>{dashboard ? `$${(dashboard.budgetUsedCents/1000).toFixed(0)}K of $${(dashboard.budgetTotalCents/1000).toFixed(0)}K used` : "--"}</Text>
         </View>
 
         <View style={[styles.statCard, { backgroundColor: "#EFF6FF" }]}>
@@ -115,87 +122,39 @@ export default function NGOManagerHome() {
           <Ionicons name="cash-outline" size={20} color="#16a34a" />
         </View>
 
-        <View style={styles.budgetRow}>
-          <View style={styles.budgetLabelCol}>
-            <Text style={styles.budgetLabel}>Program Implementation</Text>
-            <Text style={styles.budgetSub}>$450K (45%)</Text>
-          </View>
-          <View style={styles.progressCol}>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: "45%" }]} />
+        {dashboard?.budgetBreakdown?.map((b, idx) => (
+          <View style={styles.budgetRow} key={b.name + idx}>
+            <View style={styles.budgetLabelCol}>
+              <Text style={styles.budgetLabel}>{b.name}</Text>
+              <Text style={styles.budgetSub}>{`$${(b.amountCents/1000).toFixed(0)}K (${b.percent}%)`}</Text>
+            </View>
+            <View style={styles.progressCol}>
+              <View style={styles.progressTrack}>
+                <View style={[styles.progressFill, { width: `${b.percent}%` }]} />
+              </View>
             </View>
           </View>
-        </View>
-
-        <View style={styles.budgetRow}>
-          <View style={styles.budgetLabelCol}>
-            <Text style={styles.budgetLabel}>Administrative Costs</Text>
-            <Text style={styles.budgetSub}>$180K (18%)</Text>
-          </View>
-          <View style={styles.progressCol}>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: "18%", backgroundColor: "#93C5FD" }]} />
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.budgetRow}>
-          <View style={styles.budgetLabelCol}>
-            <Text style={styles.budgetLabel}>Emergency Fund</Text>
-            <Text style={styles.budgetSub}>$90K (9%)</Text>
-          </View>
-          <View style={styles.progressCol}>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: "9%", backgroundColor: "#34D399" }]} />
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.budgetRow}>
-          <View style={styles.budgetLabelCol}>
-            <Text style={styles.budgetLabel}>Available Budget</Text>
-            <Text style={styles.budgetSub}>$280K (28%)</Text>
-          </View>
-          <View style={styles.progressCol}>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: "28%", backgroundColor: "#34D399" }]} />
-            </View>
-          </View>
-        </View>
+        ))}
       </View>
 
       {/* Upcoming Deadlines */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Upcoming Deadlines</Text>
-        <View style={styles.deadlineItem}>
-          <View>
-            <Text style={styles.deadlineTitle}>Q3 Financial Report</Text>
-            <Text style={styles.deadlineSub}>WorldVision Donor • 3 days</Text>
+        {dashboard?.upcomingDeadlines?.map((d) => (
+          <View style={styles.deadlineItem} key={d.id}>
+            <View>
+              <Text style={styles.deadlineTitle}>{d.title}</Text>
+              <Text style={styles.deadlineSub}>{`${d.donor} • ${d.dueInDays} days`}</Text>
+            </View>
+            <TouchableOpacity style={styles.ghostBtn}><Text style={{color: '#065f46'}}>{d.actionLabel}</Text></TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.ghostBtn}><Text style={{color: '#065f46'}}>Review</Text></TouchableOpacity>
-        </View>
-
-        <View style={styles.deadlineItem}>
-          <View>
-            <Text style={styles.deadlineTitle}>Impact Assessment</Text>
-            <Text style={styles.deadlineSub}>UN Partnership • 5 days</Text>
-          </View>
-          <TouchableOpacity style={styles.ghostBtn}><Text style={{color: '#075985'}}>Prepare</Text></TouchableOpacity>
-        </View>
-
-        <View style={styles.deadlineItem}>
-          <View>
-            <Text style={styles.deadlineTitle}>Partnership Proposal</Text>
-            <Text style={styles.deadlineSub}>Clean Water Initiative • Review</Text>
-          </View>
-          <TouchableOpacity style={styles.ghostBtn}><Text style={{color: '#065f46'}}>Open</Text></TouchableOpacity>
-        </View>
+        ))}
       </View>
 
       {/* Bottom static nav preview (visual only) */}
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem}><Ionicons name="home" size={24} color="#fff" /></TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}><Ionicons name="handshake-outline" size={22} color="#fff" /></TouchableOpacity>
+  <TouchableOpacity style={styles.navItem}><Ionicons name="people-outline" size={22} color="#fff" /></TouchableOpacity>
         <TouchableOpacity style={styles.navItem}><Ionicons name="bar-chart-outline" size={22} color="#fff" /></TouchableOpacity>
         <TouchableOpacity style={styles.navItem}><Ionicons name="notifications-outline" size={22} color="#fff" /></TouchableOpacity>
         <TouchableOpacity style={styles.navItem}><Ionicons name="person-outline" size={22} color="#fff" /></TouchableOpacity>

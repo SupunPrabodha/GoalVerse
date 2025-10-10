@@ -6,6 +6,7 @@ import fs from "fs";
 
 import { authenticate, requireRole } from "../middleware/auth.js";
 import { upsertNGOProfile, getMyNGOProfile } from "../controllers/ngo.controller.js";
+import { getNGODashboard, listNGOEvidence } from "../controllers/dashboard.controller.js";
 
 const router = Router();
 
@@ -32,6 +33,22 @@ router.get(
   authenticate,
   requireRole("NGO_MANAGER"),
   getMyNGOProfile
+);
+
+// GET dashboard data
+router.get(
+  "/dashboard",
+  authenticate,
+  requireRole("NGO_MANAGER"),
+  getNGODashboard
+);
+
+// GET evidence list
+router.get(
+  "/evidence",
+  authenticate,
+  requireRole("NGO_MANAGER"),
+  listNGOEvidence
 );
 
 // CREATE/UPDATE my profile (multipart)
