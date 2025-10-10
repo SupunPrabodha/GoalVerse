@@ -1,6 +1,9 @@
 import NGOManagerProfile from "../models/NGOManagerProfile.js";
 import Evidence from "../models/Evidence.js";
 import User from "../models/User.js";
+import Campaign from "../models/Campaign.js";
+import Donation from "../models/Donation.js";
+import Report from "../models/Report.js";
 
 // GET /api/ngo/dashboard
 export async function getNGODashboard(req, res) {
@@ -15,35 +18,43 @@ export async function getNGODashboard(req, res) {
     const counts = { verified: 0, pending: 0, flagged: 0 };
     for (const c of evidenceCounts) counts[c._id] = c.count;
 
-    // budget aggregates are not stored; return sample breakdown using totals from evidence amounts
-    const totalEvidence = await Evidence.aggregate([
-      { $match: { ngo_id: user._id } },
-      { $group: { _id: null, sum: { $sum: "$amountCents" } } },
+    // Aggregate campaigns and donations
+    const campaigns = await Campaign.find({ ngo_id: user._id });
+    const donationsAgg = await Donation.aggregate([
+      { $match: { ngo_id: user._id, status: "COMPLETED" } },
+      { $group: { _id: null, total: { $sum: "$amountCents" }, count: { $sum: 1 } } },
     ]);
-    const totalCents = (totalEvidence[0] && totalEvidence[0].sum) || 0;
+    const donationsTotal = (donationsAgg[0] && donationsAgg[0].total) || 0;
 
-    // simple payload
+    // Budget breakdown from campaigns
+    const budgetBreakdown = campaigns.map((c) => ({ name: c.title, amountCents: c.budgetCents || 0, percent: 0 }));
+    const budgetTotal = budgetBreakdown.reduce((s, b) => s + (b.amountCents || 0), 0);
+    budgetBreakdown.forEach((b) => {
+      b.percent = budgetTotal > 0 ? Math.round((b.amountCents / budgetTotal) * 100) : 0;
+    });
+
+    // Reports due count
+    const reportsDueCount = await Report.countDocuments({ ngo_id: user._id, status: "DUE" });
+
+    // build upcoming deadlines (from reports)
+    const upcomingReports = await Report.find({ ngo_id: user._id, status: "DUE" }).sort({ dueDate: 1 }).limit(5);
+    const upcomingDeadlines = upcomingReports.map((r) => ({ id: r._id.toString(), title: r.title, donor: "", dueInDays: Math.max(0, Math.ceil((r.dueDate - Date.now()) / (1000 * 60 * 60 * 24))), actionLabel: "Prepare" }));
+
+    // recent activities from donations
+    const recentDonations = await Donation.find({ ngo_id: user._id }).sort({ createdAt: -1 }).limit(5);
+    const recentActivities = recentDonations.map((d) => ({ id: d._id.toString(), type: "donation", title: `Donation $${(d.amountCents/100).toFixed(2)}`, date: d.createdAt, amountCents: d.amountCents, status: d.status }));
+
     return res.json({
-      budgetUtilizationPercent: 72,
-      budgetTotalCents: 100000000,
-      budgetUsedCents: 72000000,
-      partnershipsCount: 1,
-      reportsDueCount: 2,
-      budgetBreakdown: [
-        { name: "Program Implementation", amountCents: 45000000, percent: 45 },
-        { name: "Administrative Costs", amountCents: 18000000, percent: 18 },
-        { name: "Emergency Fund", amountCents: 9000000, percent: 9 },
-        { name: "Available Budget", amountCents: 28000000, percent: 28 },
-      ],
-      upcomingDeadlines: [
-        { id: "r1", title: "Q3 Financial Report", donor: "WorldVision", dueInDays: 3, actionLabel: "Review" },
-        { id: "r2", title: "Impact Assessment", donor: "UN Partnership", dueInDays: 5, actionLabel: "Prepare" },
-      ],
-      recentActivities: [
-        { id: "a1", type: "donation", title: "Donation received", date: new Date(), amountCents: 4500000, status: "verified" },
-      ],
+      budgetUtilizationPercent: budgetTotal > 0 ? Math.round((donationsTotal / budgetTotal) * 100) : 0,
+      budgetTotalCents: budgetTotal,
+      budgetUsedCents: donationsTotal,
+      partnershipsCount: 0,
+      reportsDueCount,
+      budgetBreakdown,
+      upcomingDeadlines,
+      recentActivities,
       evidenceSummary: counts,
-      totalEvidenceAmountCents: totalCents,
+      totalEvidenceAmountCents: (await Evidence.aggregate([{ $match: { ngo_id: user._id } }, { $group: { _id: null, sum: { $sum: "$amountCents" } } }]))[0]?.sum || 0,
     });
   } catch (err) {
     console.error(err);

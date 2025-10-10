@@ -71,7 +71,9 @@ export default function NGOManagerHome() {
   const email = user?.email || "--";
   const logoUri = profile?.organization_logo
     ? // profile returns a path like /uploads/logos/filename
-      (API_BASE_URL.replace(/\/api\/?$/, "") + profile.organization_logo)
+      (profile.organization_logo.startsWith("http")
+        ? profile.organization_logo
+        : API_BASE_URL.replace(/\/api\/?$/, "") + profile.organization_logo)
     : null;
 
   const budgetUtil = dashboard ? dashboard.budgetUtilizationPercent / 100 : 0;
@@ -86,7 +88,9 @@ export default function NGOManagerHome() {
           <Image source={ logoUri ? { uri: logoUri } : require("../../assets/images/logo.png") } style={styles.headerLogo} />
           <View style={{ marginLeft: 12 }}>
             <Text style={styles.headerTitle}>{orgName}</Text>
-            <Text style={styles.headerSubtitle}>{user?.fullName || "NGO Manager"} • NGO Manager</Text>
+            <Text style={styles.headerSubtitle}>
+              {user?.fullName || "Member"} • {formatRoleLabel(user?.role)}
+            </Text>
           </View>
         </View>
         <TouchableOpacity style={styles.headerAvatar}>
@@ -151,16 +155,18 @@ export default function NGOManagerHome() {
         ))}
       </View>
 
-      {/* Bottom static nav preview (visual only) */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}><Ionicons name="home" size={24} color="#fff" /></TouchableOpacity>
-  <TouchableOpacity style={styles.navItem}><Ionicons name="people-outline" size={22} color="#fff" /></TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}><Ionicons name="bar-chart-outline" size={22} color="#fff" /></TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}><Ionicons name="notifications-outline" size={22} color="#fff" /></TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}><Ionicons name="person-outline" size={22} color="#fff" /></TouchableOpacity>
-      </View>
+      {/* main tab bar is provided by expo-router Tabs; removed duplicate static bottom nav */}
     </ScrollView>
   );
+}
+
+function formatRoleLabel(role) {
+  if (!role) return "Member";
+  if (role === "NGO_MANAGER") return "NGO Manager";
+  if (role === "DONOR") return "Donor";
+  if (role === "VOLUNTEER") return "Volunteer";
+  // fallback prettify
+  return role.replace(/_/g, " ").toLowerCase().replace(/(^|\s)\S/g, (t) => t.toUpperCase());
 }
 
 const styles = StyleSheet.create({
