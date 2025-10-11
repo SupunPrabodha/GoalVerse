@@ -11,6 +11,7 @@ import {
 import { me, getToken } from "../../lib/auth";
 import { api, authHeaders, API_BASE_URL } from "../../lib/api";
 import { Ionicons } from "@expo/vector-icons";
+import ManagerNavBar from "../../components/ManagerNavBar";
 
 export default function NGOManagerHome() {
   const [user, setUser] = useState(null);
@@ -79,87 +80,81 @@ export default function NGOManagerHome() {
   const reportsDue = dashboard ? dashboard.reportsDueCount : 0;
 
   return (
-    <ScrollView style={styles.page} contentContainerStyle={{ padding: 16, paddingBottom: 48 }}>
-      {/* Header */}
-      <View style={styles.headerRow}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Image source={ logoUri ? { uri: logoUri } : require("../../assets/images/logo.png") } style={styles.headerLogo} />
-          <View style={{ marginLeft: 12 }}>
-            <Text style={styles.headerTitle}>{orgName}</Text>
-            <Text style={styles.headerSubtitle}>{user?.fullName || "NGO Manager"} • NGO Manager</Text>
+    <View style={{ flex: 1, position: "relative" }}>
+      <ScrollView style={styles.page} contentContainerStyle={{ padding: 16, paddingBottom: 48 }}>
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image source={ logoUri ? { uri: logoUri } : require("../../assets/images/logo.png") } style={styles.headerLogo} />
+            <View style={{ marginLeft: 12 }}>
+              <Text style={styles.headerTitle}>{orgName}</Text>
+              <Text style={styles.headerSubtitle}>{user?.fullName || "NGO Manager"} • NGO Manager</Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.headerAvatar}>
+            <Ionicons name="person-circle" size={28} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Stat cards */}
+        <View style={styles.statRow}>
+          <View style={[styles.statCard, { backgroundColor: "#ECFDF5" }]}> 
+            <Text style={styles.statLabel}>Budget Utilization</Text>
+            <Text style={styles.statValue}>{dashboard ? `${dashboard.budgetUtilizationPercent}%` : "--"}</Text>
+            <Text style={styles.statSmall}>{dashboard ? `$${(dashboard.budgetUsedCents/1000).toFixed(0)}K of $${(dashboard.budgetTotalCents/1000).toFixed(0)}K used` : "--"}</Text>
+          </View>
+
+          <View style={[styles.statCard, { backgroundColor: "#EFF6FF" }]}> 
+            <Text style={styles.statLabel}>Partnerships</Text>
+            <Text style={styles.statValue}>{partnerships}</Text>
+            <Text style={styles.statSmall}>New proposal received</Text>
+          </View>
+
+          <View style={[styles.statCard, { backgroundColor: "#FFFBEB" }]}> 
+            <Text style={styles.statLabel}>Donor Reports Due</Text>
+            <Text style={styles.statValue}>{reportsDue}</Text>
+            <Text style={styles.statSmall}>Due within 7 days</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.headerAvatar}>
-          <Ionicons name="person-circle" size={28} color="#ffffff" />
-        </TouchableOpacity>
-      </View>
 
-      {/* Stat cards */}
-      <View style={styles.statRow}>
-        <View style={[styles.statCard, { backgroundColor: "#ECFDF5" }]}>
-          <Text style={styles.statLabel}>Budget Utilization</Text>
-          <Text style={styles.statValue}>{dashboard ? `${dashboard.budgetUtilizationPercent}%` : "--"}</Text>
-          <Text style={styles.statSmall}>{dashboard ? `$${(dashboard.budgetUsedCents/1000).toFixed(0)}K of $${(dashboard.budgetTotalCents/1000).toFixed(0)}K used` : "--"}</Text>
-        </View>
+        {/* Budget Breakdown */}
+        <View style={styles.card}>
+          <View style={styles.cardHeaderRow}>
+            <Text style={styles.cardTitle}>Budget Breakdown</Text>
+            <Ionicons name="cash-outline" size={20} color="#16a34a" />
+          </View>
 
-        <View style={[styles.statCard, { backgroundColor: "#EFF6FF" }]}>
-          <Text style={styles.statLabel}>Partnerships</Text>
-          <Text style={styles.statValue}>{partnerships}</Text>
-          <Text style={styles.statSmall}>New proposal received</Text>
-        </View>
-
-        <View style={[styles.statCard, { backgroundColor: "#FFFBEB" }]}>
-          <Text style={styles.statLabel}>Donor Reports Due</Text>
-          <Text style={styles.statValue}>{reportsDue}</Text>
-          <Text style={styles.statSmall}>Due within 7 days</Text>
-        </View>
-      </View>
-
-      {/* Budget Breakdown */}
-      <View style={styles.card}>
-        <View style={styles.cardHeaderRow}>
-          <Text style={styles.cardTitle}>Budget Breakdown</Text>
-          <Ionicons name="cash-outline" size={20} color="#16a34a" />
-        </View>
-
-        {dashboard?.budgetBreakdown?.map((b, idx) => (
-          <View style={styles.budgetRow} key={b.name + idx}>
-            <View style={styles.budgetLabelCol}>
-              <Text style={styles.budgetLabel}>{b.name}</Text>
-              <Text style={styles.budgetSub}>{`$${(b.amountCents/1000).toFixed(0)}K (${b.percent}%)`}</Text>
-            </View>
-            <View style={styles.progressCol}>
-              <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${b.percent}%` }]} />
+          {dashboard?.budgetBreakdown?.map((b, idx) => (
+            <View style={styles.budgetRow} key={b.name + idx}>
+              <View style={styles.budgetLabelCol}>
+                <Text style={styles.budgetLabel}>{b.name}</Text>
+                <Text style={styles.budgetSub}>{`$${(b.amountCents/1000).toFixed(0)}K (${b.percent}%)`}</Text>
+              </View>
+              <View style={styles.progressCol}>
+                <View style={styles.progressTrack}>
+                  <View style={[styles.progressFill, { width: `${b.percent}%` }]} />
+                </View>
               </View>
             </View>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
 
-      {/* Upcoming Deadlines */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Upcoming Deadlines</Text>
-        {dashboard?.upcomingDeadlines?.map((d) => (
-          <View style={styles.deadlineItem} key={d.id}>
-            <View>
-              <Text style={styles.deadlineTitle}>{d.title}</Text>
-              <Text style={styles.deadlineSub}>{`${d.donor} • ${d.dueInDays} days`}</Text>
+        {/* Upcoming Deadlines */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Upcoming Deadlines</Text>
+          {dashboard?.upcomingDeadlines?.map((d) => (
+            <View style={styles.deadlineItem} key={d.id}>
+              <View>
+                <Text style={styles.deadlineTitle}>{d.title}</Text>
+                <Text style={styles.deadlineSub}>{`${d.donor} • ${d.dueInDays} days`}</Text>
+              </View>
+              <TouchableOpacity style={styles.ghostBtn}><Text style={{color: '#065f46'}}>{d.actionLabel}</Text></TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.ghostBtn}><Text style={{color: '#065f46'}}>{d.actionLabel}</Text></TouchableOpacity>
-          </View>
-        ))}
-      </View>
-
-      {/* Bottom static nav preview (visual only) */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}><Ionicons name="home" size={24} color="#fff" /></TouchableOpacity>
-  <TouchableOpacity style={styles.navItem}><Ionicons name="people-outline" size={22} color="#fff" /></TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}><Ionicons name="bar-chart-outline" size={22} color="#fff" /></TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}><Ionicons name="notifications-outline" size={22} color="#fff" /></TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}><Ionicons name="person-outline" size={22} color="#fff" /></TouchableOpacity>
-      </View>
-    </ScrollView>
+          ))}
+        </View>
+      </ScrollView>
+      <ManagerNavBar />
+    </View>
   );
 }
 
