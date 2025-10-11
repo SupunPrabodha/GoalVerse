@@ -45,7 +45,7 @@ export default function TabsLayout() {
 
   const allow = (screen) => {
     if (role === 'NGO_MANAGER') return new Set(['NGOManagerHome','Projects','Reports','Notifications','Profile']).has(screen);
-    if (role === 'DONOR') return new Set(['DonorHome','Projects','Notifications','Profile']).has(screen);
+  if (role === 'DONOR') return new Set(['DonorHome','DonorDonate','Projects','Notifications','Profile']).has(screen);
     if (role === 'VOLUNTEER') return new Set(['VolunteerHome','Notifications','Profile']).has(screen);
     return false;
   };
@@ -80,6 +80,8 @@ export default function TabsLayout() {
       <Tabs.Screen name="Profile" options={{ title: "Profile", ...(allow('Profile') ? {} : { tabBarButton: () => null }) }} />
       {/* Hidden utility screen for initial redirect */}
       <Tabs.Screen name="HomeScreen" options={{ tabBarButton: () => null }} />
+      {/* Hidden donor donate screen, accessible via navigation */}
+      <Tabs.Screen name="DonorDonate" options={{ title: "Donate", tabBarButton: () => null }} />
     </Tabs>
   );
 }

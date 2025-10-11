@@ -132,9 +132,14 @@ export default function DonorHome() {
         <Text style={styles.cardText}>You haven't made any donations yet.</Text>
       </View>
 
-      <TouchableOpacity style={styles.primaryBtn} onPress={() => router.push('/(tabs)/Projects')}>
-        <Text style={{ color: "#fff", fontWeight: "700" }}>Explore Projects</Text>
-      </TouchableOpacity>
+      <View style={{ flexDirection:'row', gap:8 }}>
+        <TouchableOpacity style={[styles.primaryBtn, { flex:1 }]} onPress={() => router.push('/(tabs)/DonorDonate')}>
+          <Text style={{ color: "#fff", fontWeight: "700" }}>Donate</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.primaryBtn, { backgroundColor:'#10b981', flex:1 }]} onPress={() => router.push('/(tabs)/Projects')}>
+          <Text style={{ color: "#fff", fontWeight: "700" }}>Explore Projects</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>My Recent Evidence</Text>

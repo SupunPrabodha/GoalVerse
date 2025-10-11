@@ -181,8 +181,28 @@ router.post(
   async (req, res) => {
     try {
       const { title, category, budgetCents } = req.body;
-      const c = await Campaign.create({ ngo_id: req.user._id, title, category, budgetCents });
+      const c = await Campaign.create({ ngo_id: req.user._id, title, category, budgetCents, status: 'PROPOSAL' });
       res.status(201).json({ campaign: c });
+    } catch (err) {
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+// Update campaign status (DRAFT/PROPOSAL/ACTIVE)
+router.patch(
+  "/campaigns/:id/status",
+  authenticate,
+  requireRole("NGO_MANAGER"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body || {};
+      const allowed = ["DRAFT","PROPOSAL","ACTIVE"];
+      if (!allowed.includes(status)) return res.status(400).json({ message: 'Invalid status' });
+      const c = await Campaign.findOneAndUpdate({ _id: id, ngo_id: req.user._id }, { status }, { new: true });
+      if (!c) return res.status(404).json({ message: 'Not found' });
+      res.json({ campaign: c });
     } catch (err) {
       res.status(500).json({ message: "Server error" });
     }

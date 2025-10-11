@@ -12,6 +12,8 @@ import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.routes.js";
 
 import ngoRoutes from "./routes/ngo.routes.js";
+import donationsRoutes from "./routes/donations.routes.js";
+import partnershipsRoutes from "./routes/partnerships.routes.js";
 //import path from "path";
 
 const __filename = fileURLToPath(import.meta.url);                
@@ -44,6 +46,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/ngo", ngoRoutes);
 import publicRoutes from "./routes/public.routes.js";
 app.use("/api", publicRoutes);
+app.use("/api/donations", donationsRoutes);
+app.use("/api/partnerships", partnershipsRoutes);
 
 // Start
 const BASE_PORT = Number(process.env.PORT) || 4000;
