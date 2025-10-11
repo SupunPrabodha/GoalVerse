@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Image, ScrollView } from "react-native";
 import { useRouter } from 'expo-router';
 import { api, authHeaders } from "../../lib/api";
-import { getToken } from "../../lib/auth";
+import { getToken, me } from "../../lib/auth";
+import { Ionicons } from "@expo/vector-icons";
+import SafeScreen from "../../components/SafeScreen";
 
 export default function DonorHome() {
   const router = useRouter();
@@ -10,6 +12,25 @@ export default function DonorHome() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [items, setItems] = useState([]);
   const [isPicking, setIsPicking] = useState(false);
+  const [user, setUser] = useState(null);
+
+  async function refreshEvidence() {
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const { data } = await api.get('/ngo/evidence?limit=10', authHeaders(token));
+      setItems(data.items || []);
+    } catch {}
+  }
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try { const u = await me(); if (mounted) setUser(u); } catch {}
+      refreshEvidence();
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   async function handlePickAndUpload() {
     try {
@@ -60,6 +81,7 @@ export default function DonorHome() {
       setUploadProgress(0);
       setSelectedFile(null);
       Alert.alert('Uploaded');
+      refreshEvidence();
     } catch (e) {
       console.error(e);
       Alert.alert('Upload failed', String(e?.response?.data?.message || e.message || e));
@@ -67,8 +89,22 @@ export default function DonorHome() {
   }
 
   return (
+    <SafeScreen>
     <ScrollView style={styles.page} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
-      <Text style={styles.title}>Donor Dashboard</Text>
+      {/* Header */}
+      <View style={styles.headerRow}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={styles.headerLogoPlaceholder} />
+          <View style={{ marginLeft: 12 }}>
+            <Text style={styles.headerTitle}>{user?.fullName || 'Donor'}</Text>
+            <Text style={styles.headerSubtitle}>Donor</Text>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.headerAvatar} onPress={() => router.push('/(tabs)/Profile')}>
+          <Ionicons name="person-circle" size={28} color="#ffffff" />
+        </TouchableOpacity>
+      </View>
+
       <Text style={styles.subtitle}>Access donor reports, give feedback, and review impact summaries.</Text>
 
       <View style={styles.card}>
@@ -111,12 +147,18 @@ export default function DonorHome() {
         ))}
       </View>
     </ScrollView>
+    </SafeScreen>
   );
 }
 
 const styles = StyleSheet.create({
   page: { flex: 1, padding: 16, backgroundColor: "#FAFAF9" },
   title: { fontSize: 22, fontWeight: "800", marginTop: 12 },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  headerLogoPlaceholder: { width: 56, height: 56, borderRadius: 12, backgroundColor: '#fff' },
+  headerTitle: { fontSize: 18, fontWeight: '800', color: '#0f172a' },
+  headerSubtitle: { color: '#6b7280', marginTop: 4 },
+  headerAvatar: { backgroundColor: '#16a34a', padding: 8, borderRadius: 20 },
   subtitle: { color: "#6b7280", marginTop: 6 },
   card: { backgroundColor: "#fff", padding: 12, borderRadius: 10, marginTop: 12 },
   cardTitle: { fontWeight: "700" },

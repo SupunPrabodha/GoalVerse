@@ -4,6 +4,7 @@ import { getToken } from '../../lib/auth';
 import { api, authHeaders, API_BASE_URL } from '../../lib/api';
 import * as Linking from 'expo-linking';
 import COLORS from '../../constants/colors';
+import SafeScreen from '../../components/SafeScreen';
 
 export default function Reports() {
   const [reports, setReports] = useState([]);
@@ -48,6 +49,7 @@ export default function Reports() {
   );
 
   return (
+    <SafeScreen>
     <ScrollView style={styles.page} contentContainerStyle={{ paddingBottom: 100 }}>
       <Text style={styles.title}>Financial Reports</Text>
       <Text style={styles.subtitle}>Generate comprehensive financial reports with data visualization and analysis.</Text>
@@ -136,6 +138,7 @@ export default function Reports() {
         </View>
       </View>
     </ScrollView>
+    </SafeScreen>
   );
 }
 

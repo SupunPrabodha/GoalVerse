@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { me, clearToken, getToken } from '../../lib/auth';
 import { api, authHeaders } from '../../lib/api';
+import SafeScreen from '../../components/SafeScreen';
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -35,27 +36,28 @@ export default function Profile() {
   }
 
   return (
-    <View style={styles.page}>
-      <View style={styles.headerCard}>
-        <View style={styles.avatar} />
-        <View style={{ marginLeft: 12 }}>
-          <Text style={styles.headerName}>{user?.fullName || '—'}</Text>
-          <Text style={styles.headerSub}>{user?.role || '—'}</Text>
+    <SafeScreen>
+      <View style={styles.page}>
+        <View style={styles.headerCard}>
+          <View style={styles.avatar} />
+          <View style={{ marginLeft: 12 }}>
+            <Text style={styles.headerName}>{user?.fullName || '—'}</Text>
+            <Text style={styles.headerSub}>{(user?.role || '—').replace(/_/g, ' ')}</Text>
+          </View>
+        </View>
+
+        <View style={styles.infoCard}>
+          <Row label="Email" value={user?.email || '—'} />
+          {user?.organizationName && <Row label="Organization" value={user.organizationName} />}
+          {user?.phone && <Row label="Phone" value={user.phone} />}
+        </View>
+
+        <View style={styles.actionsRow}>
+          <TouchableOpacity style={styles.secondaryBtn} onPress={refreshProfile}><Text style={styles.secondaryText}>Refresh</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.primaryBtn} onPress={handleLogout}><Text style={{ color: '#fff', fontWeight: '700' }}>Logout</Text></TouchableOpacity>
         </View>
       </View>
-
-      <View style={styles.infoCard}>
-        <Text style={styles.infoRow}><Text style={styles.infoKey}>Email:</Text> {user?.email || '—'}</Text>
-        {user?.organizationName && (
-          <Text style={styles.infoRow}><Text style={styles.infoKey}>Organization:</Text> {user.organizationName}</Text>
-        )}
-      </View>
-
-      <View style={styles.actionsRow}>
-        <TouchableOpacity style={styles.secondaryBtn} onPress={refreshProfile}><Text style={styles.secondaryText}>Refresh</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.primaryBtn} onPress={handleLogout}><Text style={{ color: '#fff', fontWeight: '700' }}>Logout</Text></TouchableOpacity>
-      </View>
-    </View>
+    </SafeScreen>
   );
 }
 
@@ -66,10 +68,17 @@ const styles = StyleSheet.create({
   headerName: { fontSize: 18, fontWeight: '800', color: '#0f172a' },
   headerSub: { color: '#065f46', marginTop: 4, fontWeight: '600' },
   infoCard: { backgroundColor: '#fff', borderRadius: 12, padding: 14, marginTop: 12 },
-  infoRow: { color: '#334155', marginTop: 6 },
-  infoKey: { fontWeight: '700', color: '#0f172a' },
   actionsRow: { flexDirection: 'row', marginTop: 16, gap: 8 },
   primaryBtn: { backgroundColor: '#16a34a', padding: 12, borderRadius: 8, alignItems: 'center' },
   secondaryBtn: { backgroundColor: '#fff', borderColor: '#e6f4ea', borderWidth: 1, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 12 },
   secondaryText: { color: '#065f46', fontWeight: '600' },
 });
+
+function Row({ label, value }) {
+  return (
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderColor: '#F1F5F9' }}>
+      <Text style={{ color: '#0f172a', fontWeight: '700' }}>{label}:</Text>
+      <Text style={{ color: '#334155' }}>{value}</Text>
+    </View>
+  );
+}

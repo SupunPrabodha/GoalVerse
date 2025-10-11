@@ -273,6 +273,42 @@ export default function NGOManagerHome() {
         ))}
       </View>
 
+      {/* AI-Generated Compliance Analysis */}
+      <View style={styles.card}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={styles.cardTitle}>AI-Generated Compliance Analysis</Text>
+          <View style={{ backgroundColor: '#E6F4EA', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 }}>
+            <Text style={{ color: '#059669', fontWeight: '800', fontSize: 12 }}>LOW RISK</Text>
+          </View>
+        </View>
+        <Text style={{ color: '#6b7280', marginTop: 8 }}>
+          Financial management demonstrates strong adherence to donor requirements with minor documentation gaps that can be addressed before the next reporting cycle.
+        </Text>
+
+        <View style={{ marginTop: 12 }}>
+          <Text style={{ fontWeight: '800', color: '#0f172a', marginBottom: 8 }}>Key Insights</Text>
+          <Bullet text="All expenditures align with approved budget categories" />
+          <Bullet text="Documentation completeness rate: 94.2%" />
+          <Bullet text="No significant variances outside acceptable thresholds" />
+          <Bullet text="Procurement processes follow donor guidelines" />
+        </View>
+
+        <View style={{ marginTop: 12 }}>
+          <Text style={{ fontWeight: '800', color: '#0f172a', marginBottom: 8 }}>AI Recommendations</Text>
+          <Linkish text="Upload missing receipts for Q3 equipment purchases" />
+          <Linkish text="Consider reallocating surplus from operations to infrastructure" />
+          <Linkish text="Schedule mid-term budget review with stakeholders" />
+        </View>
+
+        <View style={{ marginTop: 14 }}>
+          <Text style={{ color: '#6b7280' }}>Analysis Confidence</Text>
+          <View style={{ height: 10, backgroundColor: '#e6f4ea', borderRadius: 8, overflow: 'hidden', marginTop: 6 }}>
+            <View style={{ height: 10, width: '92.4%', backgroundColor: '#16a34a' }} />
+          </View>
+          <Text style={{ marginTop: 6, color: '#065f46', fontWeight: '700' }}>92.4%</Text>
+        </View>
+      </View>
+
       {/* main tab bar is provided by expo-router Tabs; removed duplicate static bottom nav */}
       {/* Evidence upload card */}
       <View style={styles.card}>
@@ -373,3 +409,20 @@ const styles = StyleSheet.create({
   bottomNav: { position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row", justifyContent: "space-around", backgroundColor: "#16a34a", paddingVertical: 12 },
   navItem: { alignItems: "center", justifyContent: "center" },
 });
+
+function Bullet({ text }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
+      <Ionicons name="checkmark-circle" size={16} color="#16a34a" />
+      <Text style={{ marginLeft: 8, color: '#0f172a' }}>{text}</Text>
+    </View>
+  );
+}
+
+function Linkish({ text, onPress }) {
+  return (
+    <TouchableOpacity onPress={onPress} style={{ marginTop: 6 }}>
+      <Text style={{ color: '#065f46', fontWeight: '600' }}>{text}</Text>
+    </TouchableOpacity>
+  );
+}
