@@ -75,6 +75,7 @@ export default function ManagerProfile() {
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.header}>Profile & Settings</Text>
+        <Text style={styles.headerSub}>Manage your account preferences and settings</Text>
 
         {loading ? (
           <ActivityIndicator size="large" color="#16a34a" style={{ marginTop: 32 }} />
@@ -86,7 +87,7 @@ export default function ManagerProfile() {
                 style={styles.avatar}
               />
 
-              <View style={{ flex: 1, marginLeft: 12 }}>
+              <View style={{ flex: 1, marginLeft: 14 }}>
                 <Text style={styles.name}>{user?.fullName || "—"}</Text>
                 <Text style={styles.email}>{user?.email || "—"}</Text>
                 {user?.role === "NGO_MANAGER" && (
@@ -107,28 +108,28 @@ export default function ManagerProfile() {
             {Array.isArray(profile?.sdgs) && profile.sdgs.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>SDGs</Text>
-                <View style={styles.sdgList}>
-                  {profile.sdgs.map((s) => (
-                    <View key={s} style={styles.sdgPill}>
-                      <Text style={styles.sdgText}>{s}</Text>
-                    </View>
-                  ))}
-                </View>
+                  <View style={styles.sdgList}>
+                    {profile.sdgs.map((s) => (
+                      <View key={s} style={styles.sdgPill}>
+                        <Text style={styles.sdgText}>{s}</Text>
+                      </View>
+                    ))}
+                  </View>
               </View>
             )}
 
             {/* Settings list */}
             <View style={[styles.settings]}> 
-              <View style={styles.settingRow}>
+              <TouchableOpacity style={styles.settingRow} onPress={() => router.push("/(tabs)/Language") }>
                 <View>
                   <Text style={styles.settingTitle}>Language</Text>
                   <Text style={styles.settingSub}>Choose your preferred language</Text>
                 </View>
-                <TouchableOpacity style={styles.langButton}>
+                <View style={styles.langPill}>
                   <Text style={styles.langText}>English</Text>
-                  <Ionicons name="chevron-forward" size={18} color="#374151" />
-                </TouchableOpacity>
-              </View>
+                  <Ionicons name="checkmark" size={14} color="#16A34A" />
+                </View>
+              </TouchableOpacity>
 
               <View style={styles.settingRow}>
                 <View>
@@ -163,7 +164,7 @@ export default function ManagerProfile() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.version}>Version 1.2.0 • © 2024 GoalVerse</Text>
+            <Text style={styles.version}>Version 1.2.0 • © 2025 GoalVerse</Text>
           </View>
         )}
 
@@ -177,28 +178,30 @@ export default function ManagerProfile() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: "#111827" },
+  screen: { flex: 1, backgroundColor: "#F9FAFB" },
   container: { padding: 20, paddingBottom: 120 },
-  header: { color: "#9CA3AF", fontSize: 13, marginBottom: 12 },
-  card: { backgroundColor: "#fff", borderRadius: 10, padding: 18 },
+  header: { color: "#111827", fontSize: 18, fontWeight: "800", marginBottom: 6 },
+  headerSub: { color: "#6B7280", fontSize: 13, marginBottom: 12 },
+  card: { backgroundColor: "#fff", borderRadius: 12, padding: 18, shadowColor: "#000", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.06, shadowRadius: 12, elevation: 6 },
   row: { flexDirection: "row", alignItems: "center" },
-  avatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: "#F3F4F6" },
+  avatar: { width: 72, height: 72, borderRadius: 36, backgroundColor: "#F3F4F6" },
   name: { fontSize: 18, fontWeight: "800", color: "#111827" },
-  email: { color: "#6B7280", marginTop: 2 },
-  rolePill: { alignSelf: "flex-start", marginTop: 8, backgroundColor: "#ECFDF5", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 16 },
+  email: { color: "#6B7280", marginTop: 4 },
+  rolePill: { alignSelf: "flex-start", marginTop: 8, backgroundColor: "#E6F9EF", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16 },
   roleText: { color: "#16A34A", fontWeight: "700", fontSize: 12 },
   section: { marginTop: 16 },
   sectionTitle: { color: "#6B7280", fontSize: 12, marginBottom: 6 },
   sectionText: { color: "#111827", fontWeight: "700" },
-  sdgList: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  sdgPill: { backgroundColor: "#E6F4EA", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, marginRight: 8, marginBottom: 8 },
+  sdgList: { flexDirection: "row", flexWrap: "wrap" },
+  sdgPill: { backgroundColor: "#F0FFF4", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, marginRight: 8, marginBottom: 8, minWidth: 34, alignItems: "center" },
   sdgText: { color: "#065F46", fontWeight: "700" },
   settings: { marginTop: 18 },
-  settingRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 12, borderTopWidth: 1, borderTopColor: "#F3F4F6" },
+  settingRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 14, borderTopWidth: 1, borderTopColor: "#F3F4F6" },
   settingTitle: { fontWeight: "700", color: "#111827" },
-  settingSub: { color: "#6B7280", marginTop: 2 },
+  settingSub: { color: "#6B7280", marginTop: 4 },
   langButton: { flexDirection: "row", alignItems: "center", gap: 8 },
-  langText: { color: "#374151", marginRight: 6 },
+  langPill: { flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: "#E6F0EA", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18, backgroundColor: "#FFFFFF" },
+  langText: { color: "#111827", marginRight: 8, fontWeight: "700" },
   version: { marginTop: 18, color: "#9CA3AF", fontSize: 12, textAlign: "center" },
   error: { color: "#F87171", marginTop: 12 },
 });
