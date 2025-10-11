@@ -72,7 +72,6 @@ export default function FinanceDashboard() {
           <Ionicons name="add-circle-outline" size={18} color="#fff" />
           <Text style={styles.ctaText}>Create Project</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.secondary} onPress={() => router.push("/(tabs)/ProjectList")}>
           <Ionicons name="albums-outline" size={18} color="#16a34a" />
           <Text style={styles.secondaryText}>View Projects</Text>
