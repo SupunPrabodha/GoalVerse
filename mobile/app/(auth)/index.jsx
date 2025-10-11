@@ -7,7 +7,6 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   Modal,
   Pressable,
   ActivityIndicator,              
@@ -19,6 +18,7 @@ import { useRouter } from "expo-router";
 
 // 🆕 add these imports
 import { signup as apiSignup, login as apiLogin } from "../../lib/auth";
+import SafeScreen from "../../components/SafeScreen";
 
 const ROLES = ["NGO Manager", "Donor", "Volunteer"];
 
@@ -113,7 +113,7 @@ export default function AuthScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#111827" }}>
+    <SafeScreen>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         {/* Logo + Title */}
         <Image source={require("../../assets/images/logo.png")} style={styles.logo} resizeMode="contain" />
@@ -270,7 +270,7 @@ export default function AuthScreen() {
           </View>
         </Pressable>
       </Modal>
-    </SafeAreaView>
+    </SafeScreen>
   );
 }
 

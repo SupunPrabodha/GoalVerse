@@ -7,7 +7,6 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   Modal,
   Pressable,
   Alert,
@@ -16,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { saveNGOProfile } from "../../lib/ngo";
+import SafeScreen from "../../components/SafeScreen";
 
 const SDGS = [
   { id: 1,  title: "No Poverty", desc: "End poverty in all its forms." },
@@ -98,7 +98,7 @@ export default function OrgProfileSetup() {
     };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#111827" }}>
+    <SafeScreen>
       <ScrollView contentContainerStyle={{ padding: 16 }}>
         {/* Header */}
         <View style={styles.header}>
@@ -240,7 +240,7 @@ export default function OrgProfileSetup() {
           </View>
         </Pressable>
       </Modal>
-    </SafeAreaView>
+    </SafeScreen>
   );
 }
 
