@@ -11,13 +11,20 @@ import {
 import { me, getToken } from "../../lib/auth";
 import { api, authHeaders, API_BASE_URL } from "../../lib/api";
 import { Ionicons } from "@expo/vector-icons";
+import { Alert, Linking } from 'react-native';
+import { useRouter } from 'expo-router';
+import SafeScreen from '../../components/SafeScreen';
 
 export default function NGOManagerHome() {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dashboard, setDashboard] = useState(null);
   const [evidence, setEvidence] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isPicking, setIsPicking] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -59,6 +66,116 @@ export default function NGOManagerHome() {
     return () => (mounted = false);
   }, []);
 
+  async function refreshEvidence() {
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const res = await api.get('/ngo/evidence?limit=20', authHeaders(token));
+      setEvidence(res.data.items || []);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  async function handlePickAndUpload() {
+    try {
+      // dynamic import so app doesn't crash if dependency missing
+      if (isPicking) return; // prevent concurrent pickers
+      setIsPicking(true);
+      let DocumentPicker;
+      try { DocumentPicker = (await import('expo-document-picker')); } catch (e) {
+        setIsPicking(false);
+        return Alert.alert('Missing dependency', 'The Document Picker is not installed. Please run: npm install expo-document-picker');
+      }
+
+      let r;
+      try {
+        r = await DocumentPicker.getDocumentAsync({ type: '*/*' });
+      } catch (err) {
+        // handle expo-document-picker concurrency error gracefully
+        setIsPicking(false);
+        const msg = err?.message || String(err);
+        if (msg.includes('Different document picking in progress')) {
+          return Alert.alert('Picker busy', 'Another document picker is already open. Please close it and try again.');
+        }
+        return Alert.alert('Picker error', msg);
+      }
+    setIsPicking(false);
+    // small debounce to avoid concurrent picker warning on some devices
+    await new Promise((res) => setTimeout(res, 50));
+    if (r.type && r.type !== 'success') return;
+
+    // support both shapes: { uri, name, mimeType } and { assets: [{...}] }
+    const picked = (r && r.assets && r.assets[0]) ? r.assets[0] : r;
+
+    // preview selection
+    setSelectedFile({ uri: picked.uri, name: picked.name, mimeType: picked.mimeType });
+
+      const token = await getToken();
+      if (!token) return Alert.alert('Not authenticated');
+
+  const uri = picked.uri;
+  const filename = picked.name || (uri ? uri.split('/').pop() : '') || `upload-${Date.now()}`;
+  let mimeType = picked.mimeType || 'application/octet-stream';
+      // derive mime from extension if needed
+      const ext = (filename.includes('.') ? filename.split('.').pop() : '').toLowerCase();
+      if (mimeType === 'application/octet-stream' && ext) {
+        if (['jpg','jpeg'].includes(ext)) mimeType = 'image/jpeg';
+        else if (ext === 'png') mimeType = 'image/png';
+        else if (ext === 'webp') mimeType = 'image/webp';
+        else if (ext === 'heic') mimeType = 'image/heic';
+        else if (ext === 'mp4') mimeType = 'video/mp4';
+        else if (ext === 'pdf') mimeType = 'application/pdf';
+      }
+
+  // Build FormData. On Android Expo, file uri works in FormData.
+      const form = new FormData();
+      form.append('file', { uri, name: filename, type: mimeType });
+      form.append('type', mimeType.startsWith('image/') ? 'photo' : 'document');
+
+      // Use axios with onUploadProgress
+      const uploadRes = await api.post('/ngo/evidence', form, {
+        // Let axios set the correct multipart boundary automatically
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (evt) => {
+          if (evt.total) {
+            setUploadProgress(Math.round((evt.loaded / evt.total) * 100));
+          }
+        },
+      });
+
+      if (!uploadRes || !uploadRes.data) return Alert.alert('Upload failed', 'Server returned an error');
+      setUploadProgress(0);
+      setSelectedFile(null);
+      Alert.alert('Uploaded');
+      refreshEvidence();
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Upload error', String(err));
+    }
+  }
+
+  async function handleAnalyze(evidenceId) {
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const res = await api.post(`/ngo/evidence/${evidenceId}/analyze`, {}, authHeaders(token));
+      Alert.alert('Analysis complete', `Status: ${res.data.evidence.status}`);
+      refreshEvidence();
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Analysis failed');
+    }
+  }
+
+  function openFile(filename) {
+    // filename is a relative path like /uploads/evidence/xyz.jpg
+    const base = API_BASE_URL.replace(/\/api\/?$/, '');
+    const url = filename && filename.startsWith('/') ? base + filename : filename;
+    // open in browser via Linking
+    import('react-native').then(({ Linking }) => Linking.openURL(url).catch(() => Alert.alert('Unable to open')));
+  }
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -81,7 +198,8 @@ export default function NGOManagerHome() {
   const reportsDue = dashboard ? dashboard.reportsDueCount : 0;
 
   return (
-    <ScrollView style={styles.page} contentContainerStyle={{ padding: 16, paddingBottom: 48 }}>
+    <SafeScreen>
+    <ScrollView style={styles.page} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
       {/* Header */}
       <View style={styles.headerRow}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -93,7 +211,7 @@ export default function NGOManagerHome() {
             </Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.headerAvatar}>
+        <TouchableOpacity style={styles.headerAvatar} onPress={() => router.push('/(tabs)/Profile')}>
           <Ionicons name="person-circle" size={28} color="#ffffff" />
         </TouchableOpacity>
       </View>
@@ -156,7 +274,58 @@ export default function NGOManagerHome() {
       </View>
 
       {/* main tab bar is provided by expo-router Tabs; removed duplicate static bottom nav */}
+      {/* Evidence upload card */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Upload Evidence</Text>
+        <Text style={{ color: '#6b7280', marginTop: 6 }}>Upload photos or documents to attach to a campaign or report.</Text>
+        <View style={{ flexDirection: 'row', marginTop: 12 }}>
+          <TouchableOpacity style={[styles.ghostBtn, { marginRight: 8 }]} onPress={handlePickAndUpload}>
+            <Text style={{ color: '#065f46' }}>Pick & Upload</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.ghostBtn]} onPress={refreshEvidence}>
+            <Text style={{ color: '#065f46' }}>Refresh</Text>
+          </TouchableOpacity>
+        </View>
+        {selectedFile && (
+          <View style={{ marginTop: 12 }}>
+            {selectedFile.mimeType && selectedFile.mimeType.startsWith('image/') ? (
+              <Image source={{ uri: selectedFile.uri }} style={{ width: 140, height: 90, borderRadius: 8 }} />
+            ) : (
+              <Text style={{ marginTop: 6 }}>{selectedFile.name}</Text>
+            )}
+          </View>
+        )}
+        {uploadProgress > 0 && (
+          <View style={{ marginTop: 10 }}>
+            <View style={{ height: 8, backgroundColor: '#e6f4ea', borderRadius: 6, overflow: 'hidden' }}>
+              <View style={{ height: 8, backgroundColor: '#16a34a', width: `${uploadProgress}%` }} />
+            </View>
+            <Text style={{ marginTop: 6 }}>{uploadProgress}%</Text>
+          </View>
+        )}
+      </View>
+
+      {/* Evidence list */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Recent Evidence</Text>
+        {evidence.length === 0 && <Text style={{ color: '#6b7280', marginTop: 8 }}>No evidence yet.</Text>}
+        {evidence.map((ev) => (
+          <View key={ev._id} style={{ paddingVertical: 10, borderBottomWidth: 1, borderColor: '#f3f4f6' }}>
+            <Text style={{ fontWeight: '700' }}>{ev.originalname || ev.filename}</Text>
+            <Text style={{ color: '#6b7280', marginTop: 6 }}>{ev.type} • {ev.status} • ${(ev.amountCents/100).toFixed(2)}</Text>
+            <View style={{ flexDirection: 'row', marginTop: 8 }}>
+              <TouchableOpacity style={[styles.ghostBtn, { marginRight: 8 }]} onPress={() => handleAnalyze(ev._id)}>
+                <Text style={{ color: '#065f46' }}>Analyze</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.ghostBtn} onPress={() => openFile(ev.filename)}>
+                <Text style={{ color: '#065f46' }}>Open</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+      </View>
     </ScrollView>
+    </SafeScreen>
   );
 }
 

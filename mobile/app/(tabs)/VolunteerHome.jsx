@@ -1,11 +1,104 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Image, ScrollView } from "react-native";
+import { api, authHeaders, API_BASE_URL } from "../../lib/api";
+import { getToken } from "../../lib/auth";
 
 export default function VolunteerHome() {
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [items, setItems] = useState([]);
+  const [isPicking, setIsPicking] = useState(false);
+
+  async function refreshEvidence() {
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const { data } = await api.get('/ngo/evidence?limit=10', authHeaders(token));
+      setItems(data.items || []);
+    } catch {}
+  }
+
+  useEffect(() => { refreshEvidence(); }, []);
+
+  async function handlePickAndUpload() {
+    try {
+      if (isPicking) return; // prevent concurrent pickers
+      setIsPicking(true);
+      let DocumentPicker;
+      try { DocumentPicker = (await import('expo-document-picker')); } catch (e) {
+        setIsPicking(false);
+        return Alert.alert('Missing dependency', 'Run: npm install expo-document-picker');
+      }
+      let r;
+      try {
+        r = await DocumentPicker.getDocumentAsync({ type: '*/*' });
+      } catch (err) {
+        setIsPicking(false);
+        const msg = err?.message || String(err);
+        if (msg.includes('Different document picking in progress')) {
+          return Alert.alert('Picker busy', 'Another document picker is already open. Please close it and try again.');
+        }
+        return Alert.alert('Picker error', msg);
+      }
+      setIsPicking(false);
+      await new Promise((res) => setTimeout(res, 50));
+      if (r.type && r.type !== 'success') return;
+      const picked = (r && r.assets && r.assets[0]) ? r.assets[0] : r;
+      setSelectedFile(picked);
+      const token = await getToken();
+      if (!token) return Alert.alert('Not authenticated');
+      const uri = picked.uri;
+      const filename = picked.name || uri.split('/').pop() || `upload-${Date.now()}`;
+      let mimeType = picked.mimeType || 'application/octet-stream';
+      const ext = (filename.includes('.') ? filename.split('.').pop() : '').toLowerCase();
+      if (mimeType === 'application/octet-stream' && ext) {
+        if (['jpg','jpeg'].includes(ext)) mimeType = 'image/jpeg';
+        else if (ext === 'png') mimeType = 'image/png';
+        else if (ext === 'webp') mimeType = 'image/webp';
+        else if (ext === 'heic') mimeType = 'image/heic';
+        else if (ext === 'mp4') mimeType = 'video/mp4';
+        else if (ext === 'pdf') mimeType = 'application/pdf';
+      }
+      const form = new FormData();
+      form.append('file', { uri, name: filename, type: mimeType });
+      form.append('type', mimeType.startsWith('image/') ? 'photo' : 'document');
+      await api.post('/ngo/evidence', form, {
+        headers: { ...(authHeaders(token).headers), 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (evt) => { if (evt.total) setUploadProgress(Math.round((evt.loaded/evt.total)*100)); },
+      });
+      setUploadProgress(0);
+      setSelectedFile(null);
+      Alert.alert('Uploaded');
+      refreshEvidence();
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Upload failed', String(e?.response?.data?.message || e.message || e));
+    }
+  }
+
   return (
-    <View style={styles.page}>
+    <ScrollView style={styles.page} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
       <Text style={styles.title}>Volunteer Dashboard</Text>
       <Text style={styles.subtitle}>Manage assignments, check upcoming events, and log activity.</Text>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Quick Upload</Text>
+        <Text style={styles.cardText}>Upload your volunteer activity photos or documents.</Text>
+        <View style={{ flexDirection: 'row', marginTop: 12 }}>
+          <TouchableOpacity style={[styles.secondaryBtn, isPicking && { opacity: 0.6 }]} onPress={handlePickAndUpload} disabled={isPicking}><Text style={styles.secondaryText}>Pick & Upload</Text></TouchableOpacity>
+        </View>
+        {selectedFile?.mimeType?.startsWith('image/') && (
+          <Image source={{ uri: selectedFile.uri }} style={{ width: 140, height: 90, borderRadius: 8, marginTop: 10 }} />
+        )}
+        {uploadProgress > 0 && (
+          <View style={{ marginTop: 10 }}>
+            <View style={{ height: 8, backgroundColor: '#e6f4ea', borderRadius: 6, overflow: 'hidden' }}>
+              <View style={{ height: 8, backgroundColor: '#16a34a', width: `${uploadProgress}%` }} />
+            </View>
+            <Text style={{ marginTop: 6 }}>{uploadProgress}%</Text>
+          </View>
+        )}
+      </View>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Upcoming Events</Text>
@@ -15,7 +108,18 @@ export default function VolunteerHome() {
       <TouchableOpacity style={styles.primaryBtn}>
         <Text style={{ color: "#fff", fontWeight: "700" }}>Find Opportunities</Text>
       </TouchableOpacity>
-    </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>My Recent Evidence</Text>
+        {items.length === 0 && <Text style={styles.cardText}>No evidence yet.</Text>}
+        {items.map((ev) => (
+          <View key={ev._id} style={{ paddingVertical: 8, borderBottomWidth: 1, borderColor: '#f1f5f9' }}>
+            <Text style={{ fontWeight: '700' }}>{ev.originalname || ev.filename}</Text>
+            <Text style={{ color: '#6b7280', marginTop: 4 }}>{ev.type} • {ev.status}</Text>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
@@ -26,5 +130,7 @@ const styles = StyleSheet.create({
   card: { backgroundColor: "#fff", padding: 12, borderRadius: 10, marginTop: 12 },
   cardTitle: { fontWeight: "700" },
   cardText: { color: "#6b7280", marginTop: 8 },
-  primaryBtn: { marginTop: 20, backgroundColor: "#16a34a", padding: 12, borderRadius: 10, alignItems: "center" },
+  primaryBtn: { marginTop: 20, backgroundColor: "#16a34a", padding: 14, borderRadius: 12, alignItems: "center", shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4 },
+  secondaryBtn: { backgroundColor: "#fff", borderColor: "#e6f4ea", borderWidth: 1, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 12 },
+  secondaryText: { color: "#065f46", fontWeight: '600' },
 });

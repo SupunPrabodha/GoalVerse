@@ -8,7 +8,7 @@ const reportSchema = new Schema(
     type: { type: String, default: "FINANCIAL" },
     dueDate: { type: Date },
     submittedAt: { type: Date },
-    status: { type: String, enum: ["DUE", "SUBMITTED", "REVIEWED"], default: "DUE" },
+    status: { type: String, enum: ["DUE", "SUBMITTED", "REVIEWED", "COMPLETED"], default: "DUE" },
   },
   { timestamps: true }
 );

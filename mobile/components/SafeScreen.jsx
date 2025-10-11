@@ -1,11 +1,9 @@
-import { View, StyleSheet } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from "../constants/colors";
 
 export default function SafeScreen({ children }) {
-  const insets = useSafeAreaInsets();
-
-  return <View style={[styles.container, { paddingTop: insets.top }]}>{children}</View>;
+  return <SafeAreaView style={styles.container}>{children}</SafeAreaView>;
 }
 
 const styles = StyleSheet.create({
