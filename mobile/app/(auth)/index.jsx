@@ -65,11 +65,22 @@ export default function AuthScreen() {
       setErr("");
       const user = await apiLogin({ email: loginEmail.trim(), password: loginPassword });
       // If NGO Manager and not completed profile, route to setup
-      if (user.role === "NGO_MANAGER" && !user.isOrgProfileComplete) {
-        router.replace("/(setup)/OrgProfileSetup");
+      // if (user.role === "NGO_MANAGER" && !user.isOrgProfileComplete) {
+      //   router.replace("/(setup)/OrgProfileSetup");
+      // } else {
+      //   router.replace("/(tabs)/HomeScreen");
+      // }
+
+      if (user.role === "NGO_MANAGER") {
+        if (!user.isOrgProfileComplete) {
+          router.replace("/(setup)/OrgProfileSetup");
+        } else {
+          router.replace("/(tabs)/NGOManagerHome"); // ✅ go to dashboard
+        }
       } else {
         router.replace("/(tabs)/HomeScreen");
       }
+
     } catch (e) {
       setErr(e?.response?.data?.message || "Login failed. Check your credentials.");
     } finally {
