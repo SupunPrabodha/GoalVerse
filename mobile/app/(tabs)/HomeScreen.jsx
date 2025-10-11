@@ -60,8 +60,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-// Hide this redirect helper from the tab bar and deep links within the tabs group
-export const options = {
-  tabBarButton: () => null,
-};

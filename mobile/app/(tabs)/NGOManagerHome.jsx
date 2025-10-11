@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import {
-  View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { getToken } from "../../lib/auth";
+import { me, getToken } from "../../lib/auth";
 import { api, authHeaders, API_BASE_URL } from "../../lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import ManagerNavBar from "../../components/ManagerNavBar";
-import { useRouter } from "expo-router";
 
 export default function NGOManagerHome() {
-  const router = useRouter();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,15 +24,18 @@ export default function NGOManagerHome() {
     let mounted = true;
     (async () => {
       try {
+        // fetch current user and NGO profile (if available)
         const token = await getToken();
         let u = null;
         if (token) {
           const { data: meData } = await api.get("/auth/me", authHeaders(token));
           u = meData.user;
         }
+
         if (!mounted) return;
         setUser(u);
 
+        // fetch NGO profile and dashboard if manager
         if (u?.role === "NGO_MANAGER" && token) {
           try {
             const [profileRes, dashRes, evidenceRes] = await Promise.all([
@@ -40,12 +47,12 @@ export default function NGOManagerHome() {
             setProfile(profileRes.data.profile || null);
             setDashboard(dashRes.data || null);
             setEvidence(evidenceRes.data.items || []);
-          } catch {
-            /* ignore */
+          } catch (e) {
+            // ignore profile/dashboard error
           }
         }
-      } catch {
-        /* silent */
+      } catch (e) {
+        // silent
       } finally {
         if (mounted) setLoading(false);
       }
@@ -61,20 +68,16 @@ export default function NGOManagerHome() {
     );
   }
 
-  const orgName =
-    profile?.organization_name ||
-    user?.organizationName ||
-    user?.fullName ||
-    "SDG Progress Partners";
-
+  const orgName = profile?.organization_name || user?.organizationName || user?.fullName || "SDG Progress Partners";
+  const email = user?.email || "--";
   const logoUri = profile?.organization_logo
-    ? isAbsolute(profile.organization_logo)
-      ? profile.organization_logo
-      : API_BASE_URL.replace(/\/api\/?$/, "") + profile.organization_logo
+    ? // profile returns a path like /uploads/logos/filename
+      (API_BASE_URL.replace(/\/api\/?$/, "") + profile.organization_logo)
     : null;
 
-  const partnerships = dashboard?.partnershipsCount ?? 0;
-  const reportsDue = dashboard?.reportsDueCount ?? 0;
+  const budgetUtil = dashboard ? dashboard.budgetUtilizationPercent / 100 : 0;
+  const partnerships = dashboard ? dashboard.partnershipsCount : 0;
+  const reportsDue = dashboard ? dashboard.reportsDueCount : 0;
 
   return (
     <View style={{ flex: 1, position: "relative" }}>
@@ -82,49 +85,32 @@ export default function NGOManagerHome() {
         {/* Header */}
         <View style={styles.headerRow}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image
-              source={logoUri ? { uri: logoUri } : require("../../assets/images/logo.png")}
-              style={styles.headerLogo}
-            />
+            <Image source={ logoUri ? { uri: logoUri } : require("../../assets/images/logo.png") } style={styles.headerLogo} />
             <View style={{ marginLeft: 12 }}>
               <Text style={styles.headerTitle}>{orgName}</Text>
-              <Text style={styles.headerSubtitle}>
-                {(user?.fullName || "Member") + " • " + formatRoleLabel(user?.role)}
-              </Text>
+              <Text style={styles.headerSubtitle}>{user?.fullName || "NGO Manager"} • NGO Manager</Text>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.headerAvatar}
-            onPress={() => router.push("/(tabs)/Profile")}
-            accessibilityLabel="Open profile"
-          >
+          <TouchableOpacity style={styles.headerAvatar}>
             <Ionicons name="person-circle" size={28} color="#ffffff" />
           </TouchableOpacity>
         </View>
 
         {/* Stat cards */}
         <View style={styles.statRow}>
-          <View style={[styles.statCard, { backgroundColor: "#ECFDF5", marginRight: 8 }]}>
+          <View style={[styles.statCard, { backgroundColor: "#ECFDF5" }]}> 
             <Text style={styles.statLabel}>Budget Utilization</Text>
-            <Text style={styles.statValue}>
-              {dashboard ? `${dashboard.budgetUtilizationPercent}%` : "--"}
-            </Text>
-            <Text style={styles.statSmall}>
-              {dashboard
-                ? `$${(dashboard.budgetUsedCents / 1000).toFixed(0)}K of $${(
-                    dashboard.budgetTotalCents / 1000
-                  ).toFixed(0)}K used`
-                : "--"}
-            </Text>
+            <Text style={styles.statValue}>{dashboard ? `${dashboard.budgetUtilizationPercent}%` : "--"}</Text>
+            <Text style={styles.statSmall}>{dashboard ? `$${(dashboard.budgetUsedCents/1000).toFixed(0)}K of $${(dashboard.budgetTotalCents/1000).toFixed(0)}K used` : "--"}</Text>
           </View>
 
-          <View style={[styles.statCard, { backgroundColor: "#EFF6FF", marginRight: 8 }]}>
+          <View style={[styles.statCard, { backgroundColor: "#EFF6FF" }]}> 
             <Text style={styles.statLabel}>Partnerships</Text>
             <Text style={styles.statValue}>{partnerships}</Text>
             <Text style={styles.statSmall}>New proposal received</Text>
           </View>
 
-          <View style={[styles.statCard, { backgroundColor: "#FFFBEB" }]}>
+          <View style={[styles.statCard, { backgroundColor: "#FFFBEB" }]}> 
             <Text style={styles.statLabel}>Donor Reports Due</Text>
             <Text style={styles.statValue}>{reportsDue}</Text>
             <Text style={styles.statSmall}>Due within 7 days</Text>
@@ -142,7 +128,7 @@ export default function NGOManagerHome() {
             <View style={styles.budgetRow} key={b.name + idx}>
               <View style={styles.budgetLabelCol}>
                 <Text style={styles.budgetLabel}>{b.name}</Text>
-                <Text style={styles.budgetSub}>{`$${(b.amountCents / 1000).toFixed(0)}K (${b.percent}%)`}</Text>
+                <Text style={styles.budgetSub}>{`$${(b.amountCents/1000).toFixed(0)}K (${b.percent}%)`}</Text>
               </View>
               <View style={styles.progressCol}>
                 <View style={styles.progressTrack}>
@@ -162,9 +148,7 @@ export default function NGOManagerHome() {
                 <Text style={styles.deadlineTitle}>{d.title}</Text>
                 <Text style={styles.deadlineSub}>{`${d.donor} • ${d.dueInDays} days`}</Text>
               </View>
-              <TouchableOpacity style={styles.ghostBtn}>
-                <Text style={{ color: "#065f46" }}>{d.actionLabel}</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.ghostBtn}><Text style={{color: '#065f46'}}>{d.actionLabel}</Text></TouchableOpacity>
             </View>
           ))}
         </View>
@@ -172,18 +156,6 @@ export default function NGOManagerHome() {
       <ManagerNavBar />
     </View>
   );
-}
-
-function formatRoleLabel(role) {
-  if (!role) return "Member";
-  if (role === "NGO_MANAGER") return "NGO Manager";
-  if (role === "DONOR") return "Donor";
-  if (role === "VOLUNTEER") return "Volunteer";
-  return role.replace(/_/g, " ").toLowerCase().replace(/(^|\s)\S/g, (t) => t.toUpperCase());
-}
-
-function isAbsolute(url) {
-  return /^https?:\/\//i.test(url);
 }
 
 const styles = StyleSheet.create({
@@ -195,9 +167,8 @@ const styles = StyleSheet.create({
   headerSubtitle: { color: "#6b7280", marginTop: 4 },
   headerAvatar: { backgroundColor: "#16a34a", padding: 8, borderRadius: 20 },
 
-  statRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 12 },
-  statCard: { flex: 1, padding: 12, borderRadius: 12 },
-
+  statRow: { flexDirection: "row", justifyContent: "space-between", gap: 8, marginBottom: 12 },
+  statCard: { flex: 1, padding: 12, borderRadius: 12, marginRight: 8 },
   statLabel: { color: "#475569", fontSize: 13 },
   statValue: { fontSize: 20, fontWeight: "800", marginTop: 6 },
   statSmall: { color: "#475569", marginTop: 6, fontSize: 12 },
@@ -218,4 +189,7 @@ const styles = StyleSheet.create({
   deadlineTitle: { fontWeight: "700", color: "#0f172a" },
   deadlineSub: { color: "#6b7280", marginTop: 4 },
   ghostBtn: { backgroundColor: "#fff", borderRadius: 6, paddingVertical: 6, paddingHorizontal: 12, borderWidth: 1, borderColor: "#e6f4ea" },
+
+  bottomNav: { position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row", justifyContent: "space-around", backgroundColor: "#16a34a", paddingVertical: 12 },
+  navItem: { alignItems: "center", justifyContent: "center" },
 });
