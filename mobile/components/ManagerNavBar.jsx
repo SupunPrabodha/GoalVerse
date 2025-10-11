@@ -11,7 +11,7 @@ export default function ManagerNavBar() {
         <Ionicons name="home-outline" size={28} color="#fff" />
         <Text style={styles.label}>Home</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.navItem} onPress={() => router.push("/(tabs)/ProjectList")}> 
+      <TouchableOpacity style={styles.navItem} onPress={() => router.push("/(tabs)/ProjectDashboard")}> 
         <Ionicons name="folder-outline" size={28} color="#fff" />
         <Text style={styles.label}>Project</Text>
       </TouchableOpacity>
