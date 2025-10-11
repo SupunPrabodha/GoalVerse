@@ -9,6 +9,7 @@ export default function TabsLayout() {
       <Stack.Screen name="ProjectCreate" options={{ title: "New Project" }} />
       <Stack.Screen name="ProjectList" options={{ title: "Projects" }} />
       <Stack.Screen name="ProjectUpdate/[id]" options={{ title: "Update Project" }} />
+      <Stack.Screen name="ProjectDashboard" options={{ title: "Project Dashboard" }} />
       <Stack.Screen name="NGOManagerHome" options={{ title: "Home" }} />
       <Stack.Screen name="DonorHome" options={{ title: "Partners" }} />
       <Stack.Screen name="DonorProfile" options={{ title: "Donor Profile" }} />
