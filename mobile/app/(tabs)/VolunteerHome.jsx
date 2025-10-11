@@ -1,21 +1,25 @@
 import React from "react";
+import VolunteerNavBar from "../../components/VolunteerNavBar";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function VolunteerHome() {
   return (
-    <View style={styles.page}>
-      <Text style={styles.title}>Volunteer Dashboard</Text>
-      <Text style={styles.subtitle}>Manage assignments, check upcoming events, and log activity.</Text>
+    <>
+      <View style={styles.page}>
+        <Text style={styles.title}>Volunteer Dashboard</Text>
+        <Text style={styles.subtitle}>Manage assignments, check upcoming events, and log activity.</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Upcoming Events</Text>
-        <Text style={styles.cardText}>No upcoming events scheduled.</Text>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Upcoming Events</Text>
+          <Text style={styles.cardText}>No upcoming events scheduled.</Text>
+        </View>
+
+        <TouchableOpacity style={styles.primaryBtn}>
+          <Text style={{ color: "#fff", fontWeight: "700" }}>Find Opportunities</Text>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={styles.primaryBtn}>
-        <Text style={{ color: "#fff", fontWeight: "700" }}>Find Opportunities</Text>
-      </TouchableOpacity>
-    </View>
+      <VolunteerNavBar />
+    </>
   );
 }
 

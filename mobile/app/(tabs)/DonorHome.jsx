@@ -1,21 +1,25 @@
 import React from "react";
+import DonorNavBar from "../../components/DonorNavBar";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function DonorHome() {
   return (
-    <View style={styles.page}>
-      <Text style={styles.title}>Donor Dashboard</Text>
-      <Text style={styles.subtitle}>Access donor reports, give feedback, and review impact summaries.</Text>
+    <>
+      <View style={styles.page}>
+        <Text style={styles.title}>Donor Dashboard</Text>
+        <Text style={styles.subtitle}>Access donor reports, give feedback, and review impact summaries.</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Recent Donations</Text>
-        <Text style={styles.cardText}>You haven't made any donations yet.</Text>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Recent Donations</Text>
+          <Text style={styles.cardText}>You haven't made any donations yet.</Text>
+        </View>
+
+        <TouchableOpacity style={styles.primaryBtn}>
+          <Text style={{ color: "#fff", fontWeight: "700" }}>Explore Projects</Text>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={styles.primaryBtn}>
-        <Text style={{ color: "#fff", fontWeight: "700" }}>Explore Projects</Text>
-      </TouchableOpacity>
-    </View>
+      <DonorNavBar />
+    </>
   );
 }
 
