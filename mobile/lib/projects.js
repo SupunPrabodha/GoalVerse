@@ -100,3 +100,26 @@ export async function deleteProject(id) {
   await authedFetch(`/projects/${id}`, { method: "DELETE" });
   return true;
 }
+
+export async function addExpense(projectId, { name, allocated = 0, actual = 0 }) {
+  const { project } = await authedFetch(`/projects/${projectId}/expenses`, {
+    method: "POST",
+    body: JSON.stringify({ name, allocated, actual }),
+  });
+  return project;
+}
+
+export async function updateExpense(projectId, expId, payload) {
+  const { project } = await authedFetch(`/projects/${projectId}/expenses/${expId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+  return project;
+}
+
+export async function deleteExpense(projectId, expId) {
+  const { project } = await authedFetch(`/projects/${projectId}/expenses/${expId}`, {
+    method: "DELETE",
+  });
+  return project;
+}
