@@ -58,6 +58,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import ManNavBar from "../../components/ManNavBar";
 
 export default function FinanceDashboard() {
   const router = useRouter();
@@ -77,6 +78,9 @@ export default function FinanceDashboard() {
           <Text style={styles.secondaryText}>View Projects</Text>
         </TouchableOpacity>
       </View>
+
+      
+      <ManNavBar />
     </View>
   );
 }
