@@ -36,8 +36,8 @@ export async function login(req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-  const { email, password } = req.body;
-  const user = await User.findOne({ email }).lean(false);
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
     const ok = await verifyPassword(password, user.passwordHash);
@@ -46,11 +46,7 @@ export async function login(req, res) {
     const token = signToken(user);
     return res.json({ user: user.toPublic(), token });
   } catch (err) {
-    // Normalize mongoose buffering/server selection errors to a clean message
-    const msg = /buffering timed out|Server selection timed out|ECONNREFUSED/i.test(err.message)
-      ? 'Database temporarily unavailable. Please try again.'
-      : err.message;
-    return res.status(503).json({ message: msg });
+    return res.status(500).json({ message: err.message });
   }
 }
 

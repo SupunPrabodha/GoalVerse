@@ -1,19 +1,3 @@
-## API base URL (Expo SDK 54)
-
-This app now prefers `EXPO_PUBLIC_API_BASE_URL` for the backend base URL. Set it before starting Metro:
-
-```powershell
-cd "C:\Users\ASUS TUF\Desktop\New folder\mobile"
-$env:EXPO_PUBLIC_API_BASE_URL = "http://10.159.201.40:4000/api"
-npm start
-```
-
-- Replace `10.159.201.40` with your PC's IPv4 (see `ipconfig`).
-- Android emulator is auto-handled (`10.0.2.2`).
-- If the backend falls back to a different port (e.g., 4001), update the URL accordingly.
-
-From your phone’s browser, you should be able to open: `http://10.159.201.40:4000/api/health`.
-
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
