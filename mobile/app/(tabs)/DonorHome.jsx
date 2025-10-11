@@ -138,7 +138,7 @@ export default function DonorHome() {
             <TouchableOpacity style={[styles.primaryBtn, { flex:1 }]} onPress={() => router.push('/(tabs)/DonorDonate')}>
               <Text style={{ color: "#fff", fontWeight: "700" }}>Donate</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor:'#10b981', flex:1 }]} onPress={() => router.push('/(tabs)/Projects')}>
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor:'#10b981', flex:1 }]} onPress={() => router.push('/(tabs)/AllProjects')}>
               <Text style={{ color: "#fff", fontWeight: "700" }}>Explore Projects</Text>
             </TouchableOpacity>
           </View>
