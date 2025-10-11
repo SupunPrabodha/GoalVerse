@@ -32,6 +32,12 @@ export default function ProjectList() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.header}>All Projects</Text>
+        <Text style={styles.subHeader}>
+            Keep your project upto date
+        </Text>
+      </View>
       <FlatList
         data={projects}
         keyExtractor={(item) => item._id}
@@ -61,6 +67,7 @@ export default function ProjectList() {
 const styles = StyleSheet.create({
   loading: { flex: 1, backgroundColor: "#111827", justifyContent: "center", alignItems: "center" },
   container: { flex: 1, backgroundColor: "#111827" },
+  header: { fontWeight: "800", fontSize: 20, color: "#a7eec9ff", marginBottom: 4, marginTop: 16, marginLeft: 8 },
   card: { backgroundColor: "#fff", marginBottom: 12, borderRadius: 12, padding: 12 },
   name: { fontSize: 16, fontWeight: "800", color: "#0f172a" },
   muted: { color: "#6b7280", marginTop: 2 },

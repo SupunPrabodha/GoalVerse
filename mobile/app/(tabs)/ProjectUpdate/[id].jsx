@@ -131,8 +131,14 @@ export default function ProjectUpdate() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#111827" }}>
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <View style={styles.card}>
-          <Text style={styles.header}>Update Project Details</Text>
+          <View style={styles.header}>
+            <Text style={styles.header}>Update Project Details</Text>
+            <Text style={styles.subHeader}>
+                Keep your project upto date
+            </Text>
+          </View>
+          <View style={styles.card}>
+          {/* <Text style={styles.header}>Update Project Details</Text> */}
 
           <Text style={styles.label}>Project Name</Text>
           <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Project Name" />
@@ -237,14 +243,16 @@ export default function ProjectUpdate() {
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: "#fff", borderRadius: 12, padding: 14 },
-  header: { fontWeight: "800", fontSize: 18, color: "#0f172a", marginBottom: 8 },
+  card: { backgroundColor: "#fff", borderRadius: 12, padding: 14, marginTop: 20 },
+  // header: { fontWeight: "800", fontSize: 18, color: "#0f172a", marginBottom: 8 },
+  header: { fontWeight: "800", fontSize: 20, color: "#a7eec9ff", marginBottom: 4, marginTop: 8 },
+  subHeader: { color: "#7f889bff", marginBottom: 12, fontSize: 15 },
   label: { marginTop: 12, marginBottom: 6, color: "#111827", fontWeight: "700" },
-  input: { borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 10, padding: 12, color: "#0f172a" },
-  textarea: { borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 10, padding: 12, minHeight: 100, textAlignVertical: "top" },
+  input: { borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 10, padding: 12, color: "#0f172a", marginBottom: 12 },
+  textarea: { borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 10, padding: 12, minHeight: 100, textAlignVertical: "top", marginBottom: 12},
   dropdown: { borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 10, paddingVertical: 12, paddingHorizontal: 12,
-              flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  rowInput: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10 },
+              flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12, },
+  rowInput: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 12 },
   inputFlex: { flex: 1, color: "#0f172a" },
   chipsWrap: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
   chip: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#16a34a", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
