@@ -75,7 +75,7 @@ export default function AuthScreen() {
         if (!user.isOrgProfileComplete) {
           router.replace("/(setup)/OrgProfileSetup");
         } else {
-          router.replace("/(tabs)/FinanceDashboard"); // ✅ go to dashboard
+          router.replace("/(tabs)/NGOManagerHome"); // ✅ go to dashboard
         }
       } else {
         router.replace("/(tabs)/HomeScreen");

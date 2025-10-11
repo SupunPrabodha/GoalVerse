@@ -58,7 +58,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import ManNavBar from "../../components/ManNavBar";
+import ManagerNavBar from "../../components/ManagerNavBar";
 
 export default function FinanceDashboard() {
   const router = useRouter();
@@ -72,15 +72,13 @@ export default function FinanceDashboard() {
           <Ionicons name="add-circle-outline" size={18} color="#fff" />
           <Text style={styles.ctaText}>Create Project</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.secondary} onPress={() => router.push("/(tabs)/ProjectList")}>
           <Ionicons name="albums-outline" size={18} color="#16a34a" />
           <Text style={styles.secondaryText}>View Projects</Text>
         </TouchableOpacity>
       </View>
+      <ManagerNavBar />
 
-      
-      <ManNavBar />
     </View>
   );
 }

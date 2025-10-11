@@ -5,6 +5,8 @@ import { getToken, me } from "../../lib/auth";
 import { useRouter } from 'expo-router';
 import { Ionicons } from "@expo/vector-icons";
 import SafeScreen from "../../components/SafeScreen";
+import VolunteerNavBar from "../../components/VolunteerNavBar";
+
 
 export default function VolunteerHome() {
   const router = useRouter();
@@ -147,6 +149,8 @@ export default function VolunteerHome() {
       </View>
     </ScrollView>
     </SafeScreen>
+    <VolunteerNavBar />
+
   );
 }
 

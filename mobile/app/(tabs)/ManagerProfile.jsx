@@ -10,10 +10,10 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import ManagerNavBar from "../../components/ManagerNavBar";
 import { useRouter } from "expo-router";
 import { me as fetchMe, getToken, clearToken } from "../../lib/auth";
 import { API_BASE_URL } from "../../lib/api";
-import ManNavBar from "../../components/ManNavBar";
 
 function getImageUrl(path) {
   if (!path) return null;
@@ -81,12 +81,12 @@ export default function ManagerProfile() {
           <ActivityIndicator size="large" color="#16a34a" style={{ marginTop: 32 }} />
         ) : (
           <View style={styles.card}>
+            {/* ...existing code... */}
             <View style={styles.row}>
               <Image
                 source={orgLogo ? { uri: orgLogo } : require("../../assets/images/logo.png")}
                 style={styles.avatar}
               />
-
               <View style={{ flex: 1, marginLeft: 14 }}>
                 <Text style={styles.name}>{user?.fullName || "—"}</Text>
                 <Text style={styles.email}>{user?.email || "—"}</Text>
@@ -97,14 +97,12 @@ export default function ManagerProfile() {
                 )}
               </View>
             </View>
-
-            {/* Organization info */}
+            {/* ...existing code... */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Organization</Text>
               <Text style={styles.sectionText}>{profile?.organization_name || "Not provided"}</Text>
             </View>
-
-            {/* SDGs */}
+            {/* ...existing code... */}
             {Array.isArray(profile?.sdgs) && profile.sdgs.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>SDGs</Text>
@@ -117,8 +115,7 @@ export default function ManagerProfile() {
                   </View>
               </View>
             )}
-
-            {/* Settings list */}
+            {/* ...existing code... */}
             <View style={[styles.settings]}> 
               <TouchableOpacity style={styles.settingRow} onPress={() => router.push("/(tabs)/Language") }>
                 <View>
@@ -130,7 +127,6 @@ export default function ManagerProfile() {
                   <Ionicons name="checkmark" size={14} color="#16A34A" />
                 </View>
               </TouchableOpacity>
-
               <View style={styles.settingRow}>
                 <View>
                   <Text style={styles.settingTitle}>Notifications</Text>
@@ -138,7 +134,6 @@ export default function ManagerProfile() {
                 </View>
                 <Switch value={notifEnabled} onValueChange={setNotifEnabled} />
               </View>
-
               <TouchableOpacity style={styles.settingRow} onPress={() => router.push("/(tabs)/FinanceDashboard") }>
                 <View>
                   <Text style={styles.settingTitle}>Financial Account Settings</Text>
@@ -146,7 +141,6 @@ export default function ManagerProfile() {
                 </View>
                 <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
               </TouchableOpacity>
-
               <TouchableOpacity style={styles.settingRow} onPress={() => router.push("/(tabs)/HelpSupport") }>
                 <View>
                   <Text style={styles.settingTitle}>Help & Support</Text>
@@ -154,7 +148,6 @@ export default function ManagerProfile() {
                 </View>
                 <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
               </TouchableOpacity>
-
               <TouchableOpacity style={styles.settingRow} onPress={onLogout}>
                 <View>
                   <Text style={[styles.settingTitle, { color: "#DC2626" }]}>Logout</Text>
@@ -163,16 +156,12 @@ export default function ManagerProfile() {
                 <Ionicons name="log-out-outline" size={18} color="#DC2626" />
               </TouchableOpacity>
             </View>
-
             <Text style={styles.version}>Version 1.2.0 • © 2025 GoalVerse</Text>
           </View>
         )}
-
         {error ? <Text style={styles.error}>{error}</Text> : null}
       </ScrollView>
-
-      {/* Optional bottom navigation */}
-      <ManNavBar />
+      <ManagerNavBar />
     </View>
   );
 }

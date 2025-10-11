@@ -5,6 +5,8 @@ import { api, authHeaders } from "../../lib/api";
 import { getToken, me } from "../../lib/auth";
 import { Ionicons } from "@expo/vector-icons";
 import SafeScreen from "../../components/SafeScreen";
+import DonorNavBar from "../../components/DonorNavBar";
+
 
 export default function DonorHome() {
   const router = useRouter();
@@ -153,6 +155,8 @@ export default function DonorHome() {
       </View>
     </ScrollView>
     </SafeScreen>
+    <DonorNavBar />
+
   );
 }
 
