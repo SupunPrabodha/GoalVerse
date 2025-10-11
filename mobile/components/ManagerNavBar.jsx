@@ -11,6 +11,18 @@ export default function ManagerNavBar() {
         <Ionicons name="home-outline" size={28} color="#fff" />
         <Text style={styles.label}>Home</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.navItem} onPress={() => router.push("/(tabs)/ProjectList")}> 
+        <Ionicons name="folder-outline" size={28} color="#fff" />
+        <Text style={styles.label}>Project</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.navItem} onPress={() => router.push("/(tabs)/Reports")}> 
+        <Ionicons name="document-text-outline" size={28} color="#fff" />
+        <Text style={styles.label}>Report</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.navItem} onPress={() => router.push("/(tabs)/Notifications")}> 
+        <Ionicons name="notifications-outline" size={28} color="#fff" />
+        <Text style={styles.label}>Notification</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.navItem} onPress={() => router.push("/(tabs)/ManagerProfile")}> 
         <Ionicons name="person-outline" size={28} color="#fff" />
         <Text style={styles.label}>Profile</Text>
