@@ -15,6 +15,7 @@ import ngoRoutes from "./routes/ngo.routes.js";
 import donationsRoutes from "./routes/donations.routes.js";
 import partnershipsRoutes from "./routes/partnerships.routes.js";
 //import path from "path";
+import projectRoutes from "./routes/project.routes.js"; 
 
 const __filename = fileURLToPath(import.meta.url);                
 const __dirname = path.dirname(__filename);  
