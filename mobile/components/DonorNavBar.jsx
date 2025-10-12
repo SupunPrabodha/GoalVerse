@@ -15,10 +15,6 @@ export default function DonorNavBar() {
 				<Ionicons name="cash-outline" size={28} color="#fff" />
 				<Text style={styles.label}>Donate</Text>
 			</TouchableOpacity>
-			<TouchableOpacity style={styles.navItem} onPress={() => router.push("/(tabs)/ProjectList")}> 
-				<Ionicons name="folder-outline" size={28} color="#fff" />
-				<Text style={styles.label}>Projects</Text>
-			</TouchableOpacity>
 			<TouchableOpacity style={styles.navItem} onPress={() => router.push("/(tabs)/Notifications")}> 
 				<Ionicons name="notifications-outline" size={28} color="#fff" />
 				<Text style={styles.label}>Notifications</Text>
