@@ -43,13 +43,12 @@ export default function DonorProfileSetup() {
 
   const onSave = async () => {
     try {
-      const payload = {
+      await saveDonorProfile({
         organization_name: orgName.trim(),
         country: country.trim(),
         address: address.trim(),
         funding_focus: focusAreas,
-      };
-      await saveDonorProfile(payload);
+      });
       Alert.alert(
         "Profile Complete",
         "Your Donor profile has been set up successfully.",

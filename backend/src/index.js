@@ -15,6 +15,7 @@ import projectRoutes from "./routes/project.routes.js";
 import publicRoutes from "./routes/public.routes.js";
 import donationRoutes from "./routes/donation.routes.js";
 import volunteerRoutes from "./routes/volunteer.routes.js";
+import donorRoutes from "./routes/donor.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);                
 const __dirname = path.dirname(__filename);  
@@ -50,6 +51,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/public", publicRoutes); 
 app.use("/api/donations", donationRoutes);
 app.use("/api/volunteer", volunteerRoutes);
+app.use("/api/donor", donorRoutes);
 
 // Start
 const PORT = process.env.PORT || 4000;
