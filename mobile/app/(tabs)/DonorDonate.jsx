@@ -5,6 +5,7 @@ import SafeScreen from '../../components/SafeScreen';
 import { createDonation, listMyDonations } from '../../lib/donations';
 import { api } from '../../lib/api';
 import { Ionicons } from '@expo/vector-icons';
+import DonorNavBar from "../../components/DonorNavBar";
 
 export default function DonorDonate() {
   const router = useRouter();
@@ -83,18 +84,19 @@ export default function DonorDonate() {
           </View>
         )} />
       </View>
+      <DonorNavBar />
     </SafeScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  page:{ flex:1, padding:16, backgroundColor:'#FAFAF9' },
-  title:{ fontSize:22, fontWeight:'800', color:'#0f172a' },
-  card:{ backgroundColor:'#fff', padding:12, borderRadius:12, marginTop:12 },
-  label:{ marginTop:8, color:'#374151', fontWeight:'600' },
-  input:{ backgroundColor:'#fff', borderWidth:1, borderColor:'#e6e6e6', borderRadius:8, padding:10, marginTop:6 },
-  primaryBtn:{ marginTop:12, backgroundColor:'#16a34a', padding:12, borderRadius:10, alignItems:'center' },
-  row:{ backgroundColor:'#fff', padding:12, borderRadius:12, marginTop:8, flexDirection:'row', justifyContent:'space-between' },
-  optionRow:{ flexDirection:'row', alignItems:'center', paddingVertical:10, borderBottomWidth:1, borderColor:'#f1f5f9' },
-  optionSelected:{ backgroundColor:'#F0FDF4', borderRadius:8, paddingHorizontal:8 },
+  page: { flex: 1, padding: 16, backgroundColor: "#111827" },
+  title: { fontSize: 22, fontWeight: "800", color: "#a7eec9ff" },
+  card: { backgroundColor: "#fff", borderRadius: 12, padding: 12, marginTop: 12 },
+  label: { marginTop: 8, color: "#065f46", fontWeight: "700" },
+  input: { backgroundColor: "#fff", borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 8, padding: 10, marginTop: 6 },
+  primaryBtn: { marginTop: 12, backgroundColor: "#16a34a", padding: 12, borderRadius: 8, alignItems: "center" },
+  row: { backgroundColor: "#fff", padding: 12, borderRadius: 12, marginTop: 8, flexDirection: "row", justifyContent: "space-between" },
+  optionRow: { flexDirection: "row", alignItems: "center", paddingVertical: 10, borderBottomWidth: 1, borderColor: "#F2F4F7" },
+  optionSelected: { backgroundColor: "#F0FDF4", borderRadius: 8, paddingHorizontal: 8 },
 });
