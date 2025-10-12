@@ -9,6 +9,15 @@ const STATUS_MAP = {
   "Completed": "COMPLETED",
 };
 
+// List all projects (public)
+export async function listAllProjects(req, res) {
+  try {
+    const docs = await Project.find({}).sort({ createdAt: -1 });
+    return res.json({ projects: docs });
+  } catch (err) {
+    return res.status(500).json({ message: err.message || "Failed to list all projects" });
+  }
+}
 //test start here
 const normalizeStatus = (s) =>
   PROJECT_STATUSES.includes(s) ? s : STATUS_MAP[s] || "ON_GOING";

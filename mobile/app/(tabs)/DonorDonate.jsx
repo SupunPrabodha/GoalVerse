@@ -13,8 +13,8 @@ export default function DonorDonate() {
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [items, setItems] = useState([]);
-  const [campaigns, setCampaigns] = useState([]);
-  const [selectedCampaignId, setSelectedCampaignId] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
 
   async function refresh() {
     try { setItems(await listMyDonations()); } catch (e) {}
@@ -23,12 +23,11 @@ export default function DonorDonate() {
     refresh();
     (async () => {
       try {
-        const res = await api.get('/campaigns');
-        setCampaigns(res.data.campaigns || []);
-        if (params?.campaignId) setSelectedCampaignId(String(params.campaignId));
+        const res = await api.get('/projects/all');
+        setProjects(res.data.projects || []);
+        if (params?.projectId) setSelectedProjectId(String(params.projectId));
       } catch (e) {
-        // Show empty state; do not mock
-        setCampaigns([]);
+        setProjects([]);
       }
     })();
   }, []);
@@ -36,10 +35,10 @@ export default function DonorDonate() {
   async function submit() {
     const cents = Math.round(parseFloat(amount || '0') * 100);
     if (!cents || cents <= 0) return Alert.alert('Enter a valid amount');
-    if (!selectedCampaignId) return Alert.alert('Select a campaign');
+  if (!selectedProjectId) return Alert.alert('Select a project');
     try {
       setSubmitting(true);
-      await createDonation({ amountCents: cents, note, campaignId: selectedCampaignId });
+  await createDonation({ amountCents: cents, note, projectId: selectedProjectId });
       setAmount(''); setNote('');
       Alert.alert('Thank you!', 'Your donation was recorded.');
       refresh();
@@ -53,16 +52,16 @@ export default function DonorDonate() {
       <View style={styles.page}>
         <Text style={styles.title}>Make a Donation</Text>
         <View style={styles.card}>
-          <Text style={styles.label}>Select Campaign</Text>
+          <Text style={styles.label}>Select Project</Text>
           <View style={{ marginTop: 8 }}>
-            {campaigns.length === 0 && <Text style={{ color:'#6b7280' }}>No active campaigns available. Please try again later.</Text>}
-            {campaigns.map((c) => (
-              <TouchableOpacity key={c._id} style={[styles.optionRow, selectedCampaignId === c._id && styles.optionSelected]} onPress={() => setSelectedCampaignId(c._id)}>
+            {projects.length === 0 && <Text style={{ color:'#6b7280' }}>No active projects available. Please try again later.</Text>}
+            {projects.map((p) => (
+              <TouchableOpacity key={p._id} style={[styles.optionRow, selectedProjectId === p._id && styles.optionSelected]} onPress={() => setSelectedProjectId(p._id)}>
                 <View style={{ flex:1 }}>
-                  <Text style={{ fontWeight:'700', color:'#0f172a' }}>{c.title}</Text>
-                  <Text style={{ color:'#6b7280', marginTop:4 }}>{c.category}</Text>
+                  <Text style={{ fontWeight:'700', color:'#0f172a' }}>{p.name}</Text>
+                  <Text style={{ color:'#6b7280', marginTop:4 }}>{p.category}</Text>
                 </View>
-                {selectedCampaignId === c._id ? <Ionicons name="radio-button-on" size={22} color="#16a34a"/> : <Ionicons name="radio-button-off" size={22} color="#9ca3af"/>}
+                {selectedProjectId === p._id ? <Ionicons name="radio-button-on" size={22} color="#16a34a"/> : <Ionicons name="radio-button-off" size={22} color="#9ca3af"/>}
               </TouchableOpacity>
             ))}
           </View>

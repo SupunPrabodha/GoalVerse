@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
   modalItem: { paddingVertical: 14, paddingHorizontal: 6, flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderBottomWidth: 1, borderColor: "#F2F4F7" },
 
   // styles for expenses section start here
-   expCard: { backgroundColor: "#fff", borderRadius: 12, padding: 12, marginTop: 16 },
+   expCard: { backgroundColor: "#fff", borderRadius: 12, padding: 12, marginTop: 30, marginBottom: 25, boxShadow: "2px 1px 40px rgba(0,0,0,0.2)" },
   expHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
   expTitle: { fontWeight: "800", color: "#0f172a" },
   addBtn: { backgroundColor: "#16a34a", paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, flexDirection: "row", alignItems: "center", gap: 6 },
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     borderRadius: 10, padding: 8, marginBottom: 8,
   },
   expName: {
-    flex: 1, borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 8, paddingVertical: 10, paddingHorizontal: 10,
+    flex: 1, borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 8, paddingVertical: 10, paddingHorizontal: 10, marginTop: 11,
     color: "#0f172a",
   },
   amountCol: { width: 110 },

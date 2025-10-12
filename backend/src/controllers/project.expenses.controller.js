@@ -65,11 +65,20 @@ export async function removeExpenseCategory(req, res) {
     const project = await Project.findById(id);
     assertOwner(project, req.user._id);
 
+    // const cat = project.expenses.id(expId);
+    // if (!cat) return res.status(404).json({ message: "Category not found" });
+
+    // cat.remove();
+    // await project.save();
+
     const cat = project.expenses.id(expId);
     if (!cat) return res.status(404).json({ message: "Category not found" });
 
-    cat.remove();
+    // Mongoose v7: use deleteOne() on the subdoc, or pull() on the array
+    // cat.deleteOne();              //  option A
+    project.expenses.pull({ _id: cat._id }); //option B (safe with string/ObjectId)
     await project.save();
+
     return res.json({ project });
   } catch (err) {
     return res.status(err.status || 400).json({ message: err.message || "Failed to remove category" });

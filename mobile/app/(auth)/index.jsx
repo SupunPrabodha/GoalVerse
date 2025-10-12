@@ -102,6 +102,10 @@ export default function AuthScreen() {
       const user = await apiSignup(payload);
       if (user.role === "NGO_MANAGER") {
         router.replace("/(setup)/OrgProfileSetup");
+      } else if (user.role === "DONOR") {
+        router.replace("/(setup)/DonorProfileSetup");
+      } else if (user.role === "VOLUNTEER") {
+        router.replace("/(setup)/VolunteerProfileSetup");
       } else {
         router.replace("/(tabs)/HomeScreen");
       }

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
@@ -60,3 +61,9 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+// Hide this redirect helper from the tab bar and deep links within the tabs group
+export const options = {
+  tabBarButton: () => null,
+};
+
