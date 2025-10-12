@@ -13,6 +13,10 @@ const donorProfileSchema = new Schema(
       type: String,
       trim: true,
     },
+    organization_picture: {
+      type: String, // URL or file path served from /uploads or a CDN
+      trim: true,
+    },
     country: {
       type: String,
       trim: true,

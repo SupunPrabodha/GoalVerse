@@ -68,7 +68,9 @@ export default function VolunteerProfile() {
 		router.replace("/(auth)");
 	};
 
-	const volunteerAvatar = profile?.avatar && getImageUrl(profile.avatar);
+	const volunteerAvatar = profile?.profile_picture
+		? getImageUrl(profile.profile_picture)
+		: (profile?.avatar && getImageUrl(profile.avatar));
 
 	return (
 		<View style={styles.screen}>

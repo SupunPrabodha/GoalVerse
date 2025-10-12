@@ -1,15 +1,29 @@
 // Save donor profile (same pattern as NGO/Volunteer)
-export async function saveDonorProfile({ organization_name, country, address, funding_focus }) {
+export async function saveDonorProfile({ organization_name, country, address, funding_focus, organization_picture }) {
   const token = await getToken();
   if (!token) throw new Error("Not authenticated");
+
+  const form = new FormData();
+  form.append("organization_name", organization_name);
+  if (country) form.append("country", country);
+  if (address) form.append("address", address);
+  if (Array.isArray(funding_focus)) form.append("funding_focus", JSON.stringify(funding_focus));
+  if (organization_picture && organization_picture.uri) {
+    const name = organization_picture.fileName || "picture.jpg";
+    form.append("organization_picture", {
+      uri: organization_picture.uri,
+      name,
+      type: organization_picture.mimeType || "image/jpeg",
+    });
+  }
 
   const res = await fetch(`${api.defaults.baseURL}/donor/profile`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
+      // DO NOT set Content-Type for FormData
     },
-    body: JSON.stringify({ organization_name, country, address, funding_focus }),
+    body: form,
   });
 
   const data = await res.json().catch(() => ({}));
