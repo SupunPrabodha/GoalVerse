@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { listMyProjects } from "../../lib/projects";
+import { getToken } from "../../lib/auth";
 
 export default function RequestPartnership() {
   const router = useRouter();
@@ -30,14 +31,23 @@ export default function RequestPartnership() {
 
   const handleSendRequest = async () => {
     if (!selectedProject) return;
+    if (!params.id) {
+      setError("Partner ID is missing.");
+      setSending(false);
+      return;
+    }
     setSending(true);
     setError("");
     setSuccess("");
     try {
-      // Replace with your actual API endpoint and payload
+      const token = await getToken();
+      if (!token) throw new Error("No authentication token found");
       const response = await fetch("http://172.20.10.3:4000/api/partners/request", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
         body: JSON.stringify({
           partnerId: params.id,
           partnerType: params.type,
@@ -46,6 +56,7 @@ export default function RequestPartnership() {
       });
       if (!response.ok) throw new Error("Request failed");
       setSuccess("Request sent successfully!");
+      router.push("/(tabs)/Partners");
     } catch (err) {
       setError("Failed to send request");
     } finally {

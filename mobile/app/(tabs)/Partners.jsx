@@ -51,21 +51,21 @@ export default function Partners() {
           <Text style={styles.sectionTitle}>NGOs</Text>
           {ngos.length === 0 && <Text style={styles.empty}>No NGOs found.</Text>}
           {ngos.map((ngo) => (
-            <PartnerCard key={ngo._id} type="NGO" name={ngo.organization_name} focus={ngo.address} logo={ngo.organization_logo} />
+            <PartnerCard key={ngo._id} type="NGO" name={ngo.organization_name} focus={ngo.address} logo={ngo.organization_logo} {...ngo} />
           ))}
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Donors</Text>
           {donors.length === 0 && <Text style={styles.empty}>No donors found.</Text>}
           {donors.map((donor) => (
-            <PartnerCard key={donor._id} type="Donor" name={donor.organization_name || donor.country} focus={donor.funding_focus} logo={donor.organization_picture} />
+            <PartnerCard key={donor._id} type="Donor" name={donor.organization_name || donor.country} focus={donor.funding_focus} logo={donor.organization_picture} {...donor} />
           ))}
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Volunteers</Text>
           {volunteers.length === 0 && <Text style={styles.empty}>No volunteers found.</Text>}
           {volunteers.map((vol) => (
-            <PartnerCard key={vol._id} type="Volunteer" name={vol.user_id?.fullName} focus={vol.skills?.join(", ") || ""} logo={vol.profile_picture} />
+            <PartnerCard key={vol._id} type="Volunteer" name={vol.user_id?.fullName} focus={vol.skills?.join(", ") || ""} logo={vol.profile_picture} {...vol} />
           ))}
         </View>
       </ScrollView>
@@ -83,6 +83,7 @@ function PartnerCard({ type, name, focus, logo, ...partner }) {
   }
   const [imgError, setImgError] = React.useState(false);
   const handleRequest = () => {
+    console.log('PartnerCard partner:', partner);
     router.push({
       pathname: "/RequestPartnership",
       params: {
