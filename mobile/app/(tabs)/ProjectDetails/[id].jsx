@@ -5,6 +5,7 @@ import { fetchPublicProject } from "../../../lib/public";
 import { Ionicons } from "@expo/vector-icons";
 import BudgetVsActualChart from "../../../components/BudgetVsActualChart"; 
 import DonutCostPerBeneficiary from "../../../components/DonutCostPerBeneficiary";
+import ExpenseCategoriesCard from "../../../components/ExpenseCategoriesCard";
 
 
 const SDG_COLORS = ["#e5243b","#DDA63A","#4C9F38","#C5192D","#FF3A21","#26BDE2","#FCC30B",
@@ -159,6 +160,15 @@ export default function ProjectDetails() {
                 ) : (
                   <Text style={{ color: "#6b7280" }}>No expense data for this project.</Text>
                 )}
+
+                {/* 🆕 Expense categories with actual costs */}
+           <View style={{ height: 14 }} />
+           <ExpenseCategoriesCard
+             title="Expense Categories"
+             categories={(p?.expenses || []).map(e => ({ name: e.name, actual: e.actual }))}
+             currency={p?.budget?.currency || "$"}
+             onReportPress={() => console.log("Open expense reports for", p?._id)}
+           />
             </View>
         )}
 

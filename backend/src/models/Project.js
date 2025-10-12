@@ -10,6 +10,15 @@ const expenseCategorySchema = new Schema(
     name: { type: String, required: true, trim: true, maxlength: 80 },
     allocated: { type: Number, min: 0, default: 0 },
     actual: { type: Number, min: 0, default: 0 },
+     // core vs custom
+    type: { type: String, enum: ["CORE", "CUSTOM"], default: "CUSTOM" },
+    // only for CORE rows (helps you find them quickly)
+    code: {
+     type: String,
+     enum: ["PROGRAM_IMPLEMENTATION", "ADMINISTRATIVE_COSTS", "EMERGENCY_FUND"],
+   },
+   // prevent deletion/rename in update flows if you want
+   isLocked: { type: Boolean, default: false },
     isArchived: { type: Boolean, default: false }, // optional
   },
   { _id: true, timestamps: true }
@@ -89,6 +98,13 @@ const projectSchema = new Schema(
     { timestamps: true }
 );
 
+const CORE_ROWS = [
+  { code: "PROGRAM_IMPLEMENTATION",  name: "Program Implementation"  },
+  { code: "ADMINISTRATIVE_COSTS",    name: "Administrative Costs"    },
+  { code: "EMERGENCY_FUND",          name: "Emergency Fund"          },
+];
+
+
 // Helpful unique-ish index to avoid exact duplicates per owner
 projectSchema.index({ owner: 1, name: 1 }, { unique: false });
 
@@ -122,6 +138,23 @@ projectSchema.set("toObject", { virtuals: true });
 
 // 🆕 Validation guards
 projectSchema.pre("validate", function (next) {
+  // Ensure three core categories exist exactly once
+  const list = this.expenses || (this.expenses = []);
+  for (const core of CORE_ROWS) {
+    const has = list.some(
+      (e) => e.type === "CORE" && e.code === core.code
+    );
+    if (!has) {
+      list.push({
+        name: core.name,
+        type: "CORE",
+        code: core.code,
+        isLocked: true,
+        allocated: 0,
+        actual: 0,
+      });
+    }
+  }
   // dates
   if (this.start_date && this.end_date && this.end_date < this.start_date) {
     return next(new Error("End date cannot be before start date"));
