@@ -49,7 +49,7 @@ export async function createProject(req, res) {
       end_date,
       budget_amount,      // number
       budget_currency = "USD",
-      donors = [],        // array of strings
+      partners = [],        // array of { name, type }
       region = "",
       description = "",
       target_beneficiaries,
@@ -66,6 +66,14 @@ export async function createProject(req, res) {
     // find org profile to link (optional)
     const org = await NGOManagerProfile.findOne({ user_id: user._id }).select("_id");
 
+    // Validate partners: must be array of objects with name and type
+    let partnerObjs = [];
+    if (Array.isArray(partners)) {
+      partnerObjs = partners
+        .filter(d => d && typeof d === "object" && d.name && d.type)
+        .map(d => ({ name: String(d.name).trim(), type: String(d.type).trim() }));
+    }
+
     const doc = await Project.create({
       owner: user._id,
       organization: org?._id,
@@ -75,7 +83,7 @@ export async function createProject(req, res) {
       start_date: parseDate(start_date),
       end_date: parseDate(end_date),
       budget: { amount: Number(budget_amount || 0), currency: String(budget_currency).toUpperCase() },
-      donors: Array.isArray(donors) ? donors.filter(Boolean).map(String) : [],
+      partners: partnerObjs,
       region: region?.trim(),
       description: description?.trim(),
       target_beneficiaries: target_beneficiaries != null ? Number(target_beneficiaries) : undefined,

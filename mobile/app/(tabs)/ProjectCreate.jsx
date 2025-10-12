@@ -311,13 +311,17 @@ export default function ProjectCreate() {
   const [name, setName] = useState("");
   const [status, setStatus] = useState("On-going");
   const [sdg, setSdg] = useState(null);
-
+  const PARTNER_TYPES = ["Donor", "Volunteer", "NGO", "Government"];
+  const [partnerType, setPartnerType] = useState("");
+  const [partnerTypeOpen, setPartnerTypeOpen] = useState(false);
+  const [partners, setPartners] = useState([]); // [{ name, type }]
   const [startDate, setStartDate] = useState(""); // "YYYY-MM-DD"
   const [endDate, setEndDate] = useState("");
 
   const [budget, setBudget] = useState("");
-  const [donor, setDonor] = useState("");
-  const [customDonors, setCustomDonors] = useState([]); // 🆕 multiple donors preview
+  // Donor input fields
+  const [partnerName, setPartnerName] = useState("");
+  // partnerType and partners already defined above
   const [region, setRegion] = useState("");
   const [description, setDescription] = useState("");
   const [targetBeneficiaries, setTargetBeneficiaries] = useState(""); // 🆕
@@ -340,52 +344,47 @@ export default function ProjectCreate() {
 //   };
 
   const createProject = async () => {
-        try {
-            // Map display → backend enum
-            const statusEnum =
-            status === "On-going" ? "ON_GOING" :
-            status === "Planned"  ? "PLANNED"  :
-                                    "COMPLETED";
+    try {
+      const statusEnum =
+        status === "On-going" ? "ON_GOING" :
+        status === "Planned" ? "PLANNED" : "COMPLETED";
 
-            // include the currently typed donor if not added yet
-            const donors = customDonors.includes(donor.trim()) || !donor.trim()
-            ? customDonors
-            : [...customDonors, donor.trim()];
+      const payload = {
+        name: name.trim(),
+        status: statusEnum,
+        sdg: sdg?.id,
+        start_date: startDate || null,
+        end_date: endDate || null,
+        budget_amount: Number(budget || 0),
+        budget_currency: "USD",
+        partners,
+        region: region.trim(),
+        description: description.trim(),
+        target_beneficiaries: Number(targetBeneficiaries || 0),
+      };
 
-            const payload = {
-            name: name.trim(),
-            status: statusEnum,
-            sdg: sdg?.id,                        // number (1..17)
-            start_date: startDate || null,       // "YYYY-MM-DD"
-            end_date: endDate || null,
-            budget_amount: Number(budget || 0),
-            budget_currency: "USD",
-            donors,
-            region: region.trim(),
-            description: description.trim(),
-            target_beneficiaries: Number(targetBeneficiaries || 0),
-            };
-
-            const project = await apiCreateProject(payload);
-
-            Alert.alert("Project created", `“${project.name}” has been created.`, [
-            { text: "OK", onPress: () => router.back() },
-            ]);
-        } catch (e) {
-            Alert.alert("Error", e?.message || "Failed to create project.");
-        }
-    };
-
-
-  const addCustomDonor = () => {             // 🆕
-    const trimmed = donor.trim();
-    if (!trimmed) return;
-    if (customDonors.includes(trimmed)) return;
-    setCustomDonors((d) => [...d, trimmed]);
-    setDonor("");
+      const project = await apiCreateProject(payload);
+      Alert.alert("Project created", `“${project.name}” has been created.`, [
+        { text: "OK", onPress: () => router.back() },
+      ]);
+    } catch (e) {
+      Alert.alert("Error", e?.message || "Failed to create project.");
+    }
   };
-  const removeCustomDonor = (name) => {      // 🆕
-    setCustomDonors((d) => d.filter((x) => x !== name));
+
+
+  // Add donor with name and type
+  const addPartner = () => {
+    const name = partnerName.trim();
+    const type = partnerType.trim();
+    if (!name || !type) return;
+    if (partners.some((d) => d.name === name && d.type === type)) return;
+    setPartners((d) => [...d, { name, type }]);
+    setPartnerName("");
+    setPartnerType("");
+  };
+  const removePartner = (idx) => {
+    setPartners((d) => d.filter((_, i) => i !== idx));
   };
 
   const formatDate = (d) => {                 // 🆕 YYYY-MM-DD
@@ -495,28 +494,54 @@ export default function ProjectCreate() {
           </View>
 
           {/* Donors */}
-          <Text style={styles.label}>Donors / Funding Sources</Text>
-          {/* Optionally show a dropdown of registered donors here */}
+          <Text style={styles.label}>Partners / Funding Sources</Text>
           <View style={styles.inputRow}>
             <Ionicons name="person-outline" size={18} color="#16a34a" />
             <TextInput
-              style={styles.inputFlex}
-              placeholder="Enter donor / funding source"
-              value={donor}
-              onChangeText={setDonor}
+              style={[styles.inputFlex, { marginRight: 8 }]}
+              placeholder="Partner name"
+              value={partnerName}
+              onChangeText={setPartnerName}
             />
-            <TouchableOpacity onPress={addCustomDonor}>
+            <TouchableOpacity
+              style={[styles.dropdown, { flex: 1, marginRight: 8, paddingVertical: 8, paddingHorizontal: 8 }]}
+              onPress={() => setPartnerTypeOpen(true)}
+            >
+              <Text style={{ color: partnerType ? "#111827" : "#6b7280" }}>
+                {partnerType || "Select type"}
+              </Text>
+              <Ionicons name="chevron-down" size={18} color="#6b7280" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={addPartner}>
               <Ionicons name="add" size={22} color="#16a34a" />
             </TouchableOpacity>
           </View>
-
-          {/* 🆕 Donor preview chips */}
-          {customDonors.length > 0 && (
+          {/* Partner type dropdown modal */}
+          <Modal transparent visible={partnerTypeOpen} animationType="fade">
+            <Pressable style={styles.modalBackdrop} onPress={() => setPartnerTypeOpen(false)}>
+              <View style={styles.modalSheet}>
+                {PARTNER_TYPES.map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={styles.modalItem}
+                    onPress={() => {
+                      setPartnerType(type);
+                      setPartnerTypeOpen(false);
+                    }}
+                  >
+                    <Text style={{ fontSize: 16 }}>{type}</Text>
+                    {partnerType === type && <Ionicons name="checkmark" size={18} color="#16a34a" />}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </Pressable>
+          </Modal>
+          {partners.length > 0 && (
             <View style={styles.chipsWrap}>
-              {customDonors.map((d) => (
-                <View key={d} style={styles.chip}>
-                  <Text style={styles.chipText}>{d}</Text>
-                  <TouchableOpacity onPress={() => removeCustomDonor(d)}>
+              {partners.map((d, idx) => (
+                <View key={d.name + d.type + idx} style={styles.chip}>
+                  <Text style={styles.chipText}>{d.name} ({d.type})</Text>
+                  <TouchableOpacity onPress={() => removePartner(idx)}>
                     <Ionicons name="close" size={14} color="#fff" />
                   </TouchableOpacity>
                 </View>
