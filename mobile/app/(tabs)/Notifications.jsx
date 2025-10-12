@@ -9,7 +9,6 @@ export default function Notifications() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // Removed useNavigation, only using useRouter for navigation
   const router = useRouter();
 
   useEffect(() => {
@@ -75,27 +74,17 @@ const styles = StyleSheet.create({
   desc: { color: COLORS.textMuted, marginTop: 6 },
   timeText: { color: COLORS.textMuted, fontSize: 12 },
   viewBtn: {
-    marginTop: 14,
-    backgroundColor: '#16a34a',
-    paddingVertical: 8,
-    borderRadius: 20,
-    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#16a34a',
-    shadowColor: '#16a34a',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-    alignSelf: 'center',
-    minWidth: 140,
-    maxWidth: 180,
-    paddingHorizontal: 18,
+    borderRadius: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    alignSelf: 'flex-start',
+    marginTop: 8,
   },
   viewBtnText: {
-    color: '#fff',
-    fontWeight: '800',
-    fontSize: 16,
-    letterSpacing: 0.5,
+    color: '#16a34a',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
 });
