@@ -1,4 +1,3 @@
-// src/controllers/donor.controller.js
 import DonorProfile from "../models/DonorProfile.js";
 import User from "../models/User.js";
 

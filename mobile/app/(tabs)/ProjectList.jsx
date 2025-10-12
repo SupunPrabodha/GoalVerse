@@ -51,7 +51,12 @@ export default function ProjectList() {
                 <Ionicons name="create-outline" size={16} color="#fff" />
                 <Text style={styles.btnText}>Update</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.btnGhost} onPress={() => router.push(`/(tabs)/ProjectUpdate/${item._id}`)}>
+              {/* <TouchableOpacity style={styles.btnGhost} onPress={() => router.push(`/(tabs)/ProjectUpdate/${item._id}`)}> */}
+               <TouchableOpacity
+                style={styles.btnGhost}
+                onPress={() =>
+                  router.push({ pathname: "/(tabs)/ShowProject", params:  { id: item._id } })
+                }>
                 <Ionicons name="eye-outline" size={16} color="#16a34a" />
                 <Text style={styles.btnGhostText}>View</Text>
               </TouchableOpacity>

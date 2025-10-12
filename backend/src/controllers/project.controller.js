@@ -1,8 +1,6 @@
-// backend/src/controllers/project.controller.js
 import Project, { PROJECT_STATUSES } from "../models/Project.js";
 import NGOManagerProfile from "../models/NGOManagerProfile.js";
 
-/** Map human labels from app -> enum used in DB */
 const STATUS_MAP = {
   "On-going": "ON_GOING",
   "Planned": "PLANNED",

@@ -1,6 +1,3 @@
-// Get partnership requests received by the logged-in user
-// ...existing code...
-// ...existing code...
 import User from "../models/User.js";
 import Project from "../models/Project.js";
 
