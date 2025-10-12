@@ -64,7 +64,7 @@ export default function Partners() {
           <Text style={styles.sectionTitle}>Volunteers</Text>
           {volunteers.length === 0 && <Text style={styles.empty}>No volunteers found.</Text>}
           {volunteers.map((vol) => (
-            <PartnerCard key={vol._id} type="Volunteer" name={vol.user_id?.name || vol.district} focus={vol.skills?.join(", ") || ""} logo={vol.profile_picture} />
+            <PartnerCard key={vol._id} type="Volunteer" name={vol.user_id?.fullName} focus={vol.skills?.join(", ") || ""} logo={vol.profile_picture} />
           ))}
         </View>
         <TouchableOpacity style={styles.exploreBtn}><Text style={styles.exploreText}>🌎 Explore More Opportunities</Text></TouchableOpacity>

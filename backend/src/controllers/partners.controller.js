@@ -22,7 +22,7 @@ export async function getAllDonors(req, res) {
 
 export async function getAllVolunteers(req, res) {
   try {
-    const volunteers = await VolunteerProfile.find({});
+    const volunteers = await VolunteerProfile.find({}).populate("user_id", "fullName");
     res.json({ volunteers });
   } catch (err) {
     res.status(500).json({ message: err.message || "Failed to fetch volunteers." });
