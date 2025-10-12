@@ -83,6 +83,14 @@ function PartnerCard({ type, name, focus, logo, ...partner }) {
   }
   const [imgError, setImgError] = React.useState(false);
   const handleRequest = () => {
+    let userId = partner._id;
+    if (type === "Volunteer" && partner.user_id && partner.user_id._id) {
+      userId = partner.user_id._id;
+    }
+    // If NGO or Donor profiles have user_id, use that
+    if ((type === "NGO" || type === "Donor") && partner.user_id) {
+      userId = partner.user_id;
+    }
     console.log('PartnerCard partner:', partner);
     router.push({
       pathname: "/RequestPartnership",
@@ -91,7 +99,7 @@ function PartnerCard({ type, name, focus, logo, ...partner }) {
         name,
         focus,
         logo: logoUrl,
-        id: partner._id,
+        id: userId,
       },
     });
   };

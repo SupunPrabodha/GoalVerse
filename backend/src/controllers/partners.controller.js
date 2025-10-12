@@ -1,3 +1,25 @@
+// Get partnership requests received by the logged-in user
+// ...existing code...
+// ...existing code...
+import User from "../models/User.js";
+import Project from "../models/Project.js";
+
+export async function getReceivedPartnershipRequests(req, res) {
+  try {
+    const userId = req.user?._id;
+    console.log('[ReceivedRequests] Logged-in userId:', userId);
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+    // Find requests where the logged-in user is the partnerId
+    const requests = await PartnershipRequest.find({ partnerId: userId })
+      .populate("requester", "fullName email role")
+      .populate("projectId", "name");
+    console.log('[ReceivedRequests] Found requests:', requests);
+    res.json({ requests });
+  } catch (err) {
+    console.error('[ReceivedRequests] Error:', err);
+    res.status(500).json({ message: err.message || "Failed to fetch partnership requests." });
+  }
+}
 import NGOManagerProfile from "../models/NGOManagerProfile.js";
 import DonorProfile from "../models/DonorProfile.js";
 import VolunteerProfile from "../models/VolunteerProfile.js";
