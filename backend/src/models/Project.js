@@ -60,10 +60,21 @@ const projectSchema = new Schema(
             currency: { type: String, default: "USD", trim: true, uppercase: true },
         },
 
-        donors: {
-            type: [String],
-            default: [],
-        },
+    partners: {
+      type: [
+        {
+          name: { type: String, required: true, trim: true, maxlength: 120 },
+          type: {
+            type: String,
+            required: true,
+            trim: true,
+            enum: ["Donor", "Volunteer", "NGO", "Government"],
+            maxlength: 80
+          },
+        }
+      ],
+      default: [],
+    },
 
         region: { type: String, trim: true, maxlength: 120 },
 
