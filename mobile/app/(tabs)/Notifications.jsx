@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import SafeScreen from "../../components/SafeScreen";
 import COLORS from "../../constants/colors";
+import { useRouter } from "expo-router";
 import { listReceivedPartnershipRequests } from "../../lib/partners";
 
 export default function Notifications() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // Removed useNavigation, only using useRouter for navigation
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchRequests() {
@@ -44,6 +47,17 @@ export default function Notifications() {
               <Text style={styles.desc}>Type: {req.partnerType}</Text>
               <Text style={styles.desc}>Status: {req.status}</Text>
               <Text style={styles.timeText}>{new Date(req.createdAt).toLocaleString()}</Text>
+              <TouchableOpacity
+                style={styles.viewBtn}
+                onPress={() => {
+                  const pid = req.projectId?._id || req.projectId;
+                  if (pid) {
+                    router.push(`/ProjectDetails/${pid}`);
+                  }
+                }}
+              >
+                <Text style={styles.viewBtnText}>View Project</Text>
+              </TouchableOpacity>
             </View>
           ))
         )}
@@ -60,4 +74,16 @@ const styles = StyleSheet.create({
   cardTitle: { fontWeight: '700', color: COLORS.text },
   desc: { color: COLORS.textMuted, marginTop: 6 },
   timeText: { color: COLORS.textMuted, fontSize: 12 },
+  viewBtn: {
+    marginTop: 10,
+    backgroundColor: COLORS.primary,
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  viewBtnText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 15,
+  },
 });
