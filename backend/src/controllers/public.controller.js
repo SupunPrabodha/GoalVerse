@@ -1,13 +1,6 @@
-// ESM
 import Project from "../models/Project.js";
 import NGOManagerProfile from "../models/NGOManagerProfile.js";
 
-/**
- * GET /api/public/org-overview?sdg=15&region=Central
- * Returns per-organization aggregates for donors/volunteers:
- *  - org: {_id, name, logo}
- *  - stats: {projects, budgetTotal, allocatedTotal, utilizationPct, achievedBeneficiaries, targetBeneficiaries, sdgs[]}
- */
 export async function orgOverview(req, res) {
   try {
     const { sdg, region } = req.query;

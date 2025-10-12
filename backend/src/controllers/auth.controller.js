@@ -1,4 +1,3 @@
-// ESM
 import { body, validationResult } from "express-validator";
 import {
   createUser,

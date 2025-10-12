@@ -1,6 +1,3 @@
-
-
-// VolunteerHome.jsx - Refactored to match HomeScreen.jsx structure/content
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet,

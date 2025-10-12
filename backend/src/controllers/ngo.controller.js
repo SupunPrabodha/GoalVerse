@@ -1,4 +1,3 @@
-// src/controllers/ngo.controller.js
 import path from "path";
 import NGOManagerProfile from "../models/NGOManagerProfile.js";
 import User from "../models/User.js";
