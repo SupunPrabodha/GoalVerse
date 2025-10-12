@@ -1,9 +1,8 @@
 
 // DonorHome.jsx - Refactored to match HomeScreen.jsx structure/content
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet,
-  ActivityIndicator, FlatList, Image, ScrollView, Modal, Pressable
-} from "react-native";
+import { useRouter } from "expo-router";
+import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet, ActivityIndicator, FlatList, Image, ScrollView, Modal, Pressable} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchOrgOverview } from "../../lib/public";
 import DonorNavBar from "../../components/DonorNavBar";
@@ -37,6 +36,7 @@ const SDGS = [
 const REGIONS = ["All Regions", "Central", "North", "South", "East", "West"];
 
 export default function DonorHome() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [orgs, setOrgs] = useState([]);
   const [filter, setFilter] = useState({ sdg: null, region: null });
@@ -120,9 +120,14 @@ export default function DonorHome() {
           <View style={[styles.progressFill, { width: `${Math.min(util, 100)}%` }]} />
         </View>
         <TouchableOpacity
-            style={styles.viewBtn}
+          style={styles.viewBtn}
+          onPress={() => {
+            if (org?._id) {
+              router.push(`/OrgProjects/${org._id}`);
+            }
+          }}
         >      
-            <Text style={styles.viewText}>View Projects</Text>
+          <Text style={styles.viewText}>View Projects</Text>
         </TouchableOpacity>
       </View>
     );

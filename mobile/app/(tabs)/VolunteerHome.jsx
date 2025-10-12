@@ -2,6 +2,7 @@
 
 // VolunteerHome.jsx - Refactored to match HomeScreen.jsx structure/content
 import React, { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet,
   ActivityIndicator, FlatList, Image, ScrollView, Modal, Pressable
 } from "react-native";
@@ -38,6 +39,7 @@ const SDGS = [
 const REGIONS = ["All Regions", "Central", "North", "South", "East", "West"];
 
 export default function VolunteerHome() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [orgs, setOrgs] = useState([]);
   const [filter, setFilter] = useState({ sdg: null, region: null });
@@ -121,9 +123,14 @@ export default function VolunteerHome() {
           <View style={[styles.progressFill, { width: `${Math.min(util, 100)}%` }]} />
         </View>
         <TouchableOpacity
-            style={styles.viewBtn}
+          style={styles.viewBtn}
+          onPress={() => {
+            if (org?._id) {
+              router.push(`/OrgProjects/${org._id}`);
+            }
+          }}
         >      
-            <Text style={styles.viewText}>View Projects</Text>
+          <Text style={styles.viewText}>View Projects</Text>
         </TouchableOpacity>
       </View>
     );
