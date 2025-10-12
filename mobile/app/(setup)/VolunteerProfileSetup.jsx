@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import * as ImagePicker from "expo-image-picker";
 import {
   View,
   Text,
@@ -10,6 +11,7 @@ import {
   Modal,
   Pressable,
   Alert,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -33,6 +35,7 @@ export default function VolunteerProfileSetup() {
   const [skills, setSkills] = useState([]);
   const [district, setDistrict] = useState("");
   const [availability, setAvailability] = useState("");
+  const [picture, setPicture] = useState(null);
 
   const toggleSkill = (item) =>
     setSkills((arr) =>
@@ -48,6 +51,7 @@ export default function VolunteerProfileSetup() {
         skills,
         district: district.trim(),
         availability,
+        profile_picture: picture,
       });
       Alert.alert(
         "Profile Complete",
@@ -77,6 +81,39 @@ export default function VolunteerProfileSetup() {
         </Text>
 
         <View style={styles.card}>
+          <Text style={styles.label}>Profile Picture</Text>
+          <TouchableOpacity
+            style={{ marginBottom: 12, alignItems: "center" }}
+            onPress={async () => {
+              const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.7,
+              });
+              if (!result.canceled && result.assets && result.assets.length > 0) {
+                const asset = result.assets[0];
+                setPicture({
+                  uri: asset.uri,
+                  fileName: asset.fileName || "profile.jpg",
+                  mimeType: asset.type || "image/jpeg",
+                });
+              }
+            }}
+          >
+            <View style={{
+              width: 100, height: 100, borderRadius: 12, backgroundColor: "#e5e7eb", alignItems: "center", justifyContent: "center"
+            }}>
+              {picture?.uri ? (
+                <Image source={{ uri: picture.uri }} style={{ width: 100, height: 100, borderRadius: 12 }} />
+              ) : (
+                <Ionicons name="image-outline" size={40} color="#6b7280" />
+              )}
+            </View>
+            <Text style={{ color: "#6b7280", marginTop: 6 }}>
+              {picture?.fileName ? picture.fileName : "Select Picture"}
+            </Text>
+          </TouchableOpacity>
           <Text style={styles.sectionTitle}>Volunteer Details</Text>
           <Text style={styles.sectionHint}>
             Set up your volunteer profile to participate in activities
