@@ -9,6 +9,10 @@ const volunteerProfileSchema = new Schema(
       required: true,
       unique: true,
     },
+    profile_picture: {
+      type: String, // URL or file path served from /uploads or a CDN
+      trim: true,
+    },
     age: {
       type: Number,
       min: 15,

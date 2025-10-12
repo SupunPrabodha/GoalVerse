@@ -17,9 +17,25 @@ export async function upsertVolunteerProfile(req, res) {
     if (!age || !district || !availability) {
       return res.status(400).json({ message: "Missing required fields." });
     }
+
+    // Handle uploaded picture
+    let profile_picture;
+    if (req.file) {
+      profile_picture = `/uploads/logos/${req.file.filename}`;
+    }
+
+    const update = {
+      age,
+      skills,
+      district,
+      availability,
+      user_id: userId,
+      ...(profile_picture ? { profile_picture } : {}),
+    };
+
     const profile = await VolunteerProfile.findOneAndUpdate(
       { user_id: userId },
-      { age, skills, district, availability, user_id: userId },
+      update,
       { upsert: true, new: true }
     );
     await User.findByIdAndUpdate(userId, { isOrgProfileComplete: true });
