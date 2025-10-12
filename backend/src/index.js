@@ -12,8 +12,8 @@ import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.routes.js";
 
 import ngoRoutes from "./routes/ngo.routes.js";
-//import path from "path";
 import projectRoutes from "./routes/project.routes.js"; 
+import publicRoutes from "./routes/public.routes.js";
 import donationRoutes from "./routes/donation.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);                
@@ -46,7 +46,8 @@ app.get("/api/health", (_, res) => res.json({ ok: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/ngo", ngoRoutes);
 
-app.use("/api/projects", projectRoutes); 
+app.use("/api/projects", projectRoutes);
+app.use("/api/public", publicRoutes); 
 app.use("/api/donations", donationRoutes);
 
 // Start
