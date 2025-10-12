@@ -67,7 +67,6 @@ export default function Partners() {
             <PartnerCard key={vol._id} type="Volunteer" name={vol.user_id?.fullName} focus={vol.skills?.join(", ") || ""} logo={vol.profile_picture} />
           ))}
         </View>
-        <TouchableOpacity style={styles.exploreBtn}><Text style={styles.exploreText}>🌎 Explore More Opportunities</Text></TouchableOpacity>
       </ScrollView>
       <ManagerNavBar />
     </View>
