@@ -4,6 +4,8 @@ import { useLocalSearchParams } from "expo-router";
 import { fetchPublicProject } from "../../../lib/public";
 import { Ionicons } from "@expo/vector-icons";
 import BudgetVsActualChart from "../../../components/BudgetVsActualChart"; 
+import DonutCostPerBeneficiary from "../../../components/DonutCostPerBeneficiary";
+
 
 const SDG_COLORS = ["#e5243b","#DDA63A","#4C9F38","#C5192D","#FF3A21","#26BDE2","#FCC30B",
   "#A21942","#FD6925","#DD1367","#FD9D24","#BF8B2E","#3F7E44","#0A97D9","#56C02B","#00689D","#19486A"];
@@ -38,6 +40,14 @@ export default function ProjectDetails() {
    budget: Number(e.allocated || 0), // planned
    actual: Number(e.actual || 0),    // spent
  }));
+
+  // 🟢 ADDED: donut data (uses CPB if beneficiaries are available; else falls back to actual spend)
+ const donutRows = (p?.expenses || []).map((e) => ({
+   name: e.name,
+   actual: Number(e.actual || 0),
+   beneficiaries: Number(e.beneficiaries || 0),
+ }));
+ const donutMetric = donutRows.some((r) => r.beneficiaries > 0) ? "cpb" : "actual";
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#111827" }}>
@@ -134,6 +144,21 @@ export default function ProjectDetails() {
                 ) : (
                 <Text style={{ color: "#6b7280" }}>No expense data for this project.</Text>
                 )}
+
+                            {/* 🟢 ADDED: Donut in the same toggle section */}
+                <View style={{ height: 14 }} />
+                <Text style={s.sectionTitle}>Cost per Beneficiary Breakdown</Text>
+                {donutRows.length > 0 ? (
+                  <DonutCostPerBeneficiary
+                    data={donutRows}
+                    currency="$"
+                    metric={donutMetric}  // "cpb" if beneficiaries per category exist; otherwise "actual"
+                    title="Cost per Beneficiary Breakdown"
+                    subtitle="Distribution of beneficiary-related costs"
+                  />
+                ) : (
+                  <Text style={{ color: "#6b7280" }}>No expense data for this project.</Text>
+                )}
             </View>
         )}
 
@@ -191,7 +216,7 @@ const s = StyleSheet.create({
   lightPillText: { color: "#111827", fontWeight: "700" },
 
   card: { backgroundColor: "#fff", borderRadius: 12, padding: 12, marginBottom: 12 },
-  sectionTitle: { fontWeight: "800", color: "#0f172a", marginBottom: 8 },
+  sectionTitle: { fontWeight: "800", color: "#0f172a", marginBottom: 8, fontSize: 18 },
 
   detailRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 10 },
   detailIcon: { width: 32, height: 32, borderRadius: 8, backgroundColor: "#f0fdf4", alignItems: "center", justifyContent: "center" },
