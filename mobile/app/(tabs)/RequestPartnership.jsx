@@ -17,14 +17,13 @@ export default function RequestPartnership() {
   useEffect(() => {
     async function fetchProjects() {
       try {
-        // Replace with your actual API call to get user's projects
-  const projects = await listMyProjects();
-  setProjects(projects || []);
-      } catch (err) {
-        setError("Failed to load projects");
-      } finally {
-        setLoading(false);
-      }
+            const projects = await listMyProjects();
+            setProjects(projects || []);
+          } catch (err) {
+            setError("Failed to load projects");
+          } finally {
+            setLoading(false);
+          }
     }
     fetchProjects();
   }, []);
