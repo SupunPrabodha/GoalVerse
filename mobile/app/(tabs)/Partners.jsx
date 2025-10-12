@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
-
-const API_BASE = "http://172.20.10.3:4000/api/partners"; // Updated to local IP
+import ManagerNavBar from "../../components/ManagerNavBar";
+const API_BASE = "http://172.20.10.3:4000/api/partners"; 
 
 export default function Partners() {
   const [ngos, setNgos] = useState([]);
@@ -42,32 +42,35 @@ export default function Partners() {
   }
 
   return (
-    <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-      <Text style={styles.title}>Partnership Network</Text>
-      <Text style={styles.subtitle}>Find and connect with funding partners</Text>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>NGOs</Text>
-        {ngos.length === 0 && <Text style={styles.empty}>No NGOs found.</Text>}
-        {ngos.map((ngo) => (
-          <PartnerCard key={ngo._id} type="NGO" name={ngo.organization_name} focus={ngo.address} logo={ngo.organization_logo} />
-        ))}
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Donors</Text>
-        {donors.length === 0 && <Text style={styles.empty}>No donors found.</Text>}
-        {donors.map((donor) => (
-          <PartnerCard key={donor._id} type="Donor" name={donor.organization_name || donor.country} focus={donor.funding_focus} logo={donor.organization_picture} />
-        ))}
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Volunteers</Text>
-        {volunteers.length === 0 && <Text style={styles.empty}>No volunteers found.</Text>}
-        {volunteers.map((vol) => (
-          <PartnerCard key={vol._id} type="Volunteer" name={vol.user_id?.name || vol.district} focus={vol.skills?.join(", ") || ""} logo={vol.profile_picture} />
-        ))}
-      </View>
-      <TouchableOpacity style={styles.exploreBtn}><Text style={styles.exploreText}>🌎 Explore More Opportunities</Text></TouchableOpacity>
-    </ScrollView>
+    <View style={{ flex: 1 }}>
+      <ScrollView style={styles.scroll} contentContainerStyle={[styles.scrollContent, { paddingBottom: 80 }]}>
+        <Text style={styles.title}>Partnership Network</Text>
+        <Text style={styles.subtitle}>Find and connect with funding partners</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>NGOs</Text>
+          {ngos.length === 0 && <Text style={styles.empty}>No NGOs found.</Text>}
+          {ngos.map((ngo) => (
+            <PartnerCard key={ngo._id} type="NGO" name={ngo.organization_name} focus={ngo.address} logo={ngo.organization_logo} />
+          ))}
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Donors</Text>
+          {donors.length === 0 && <Text style={styles.empty}>No donors found.</Text>}
+          {donors.map((donor) => (
+            <PartnerCard key={donor._id} type="Donor" name={donor.organization_name || donor.country} focus={donor.funding_focus} logo={donor.organization_picture} />
+          ))}
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Volunteers</Text>
+          {volunteers.length === 0 && <Text style={styles.empty}>No volunteers found.</Text>}
+          {volunteers.map((vol) => (
+            <PartnerCard key={vol._id} type="Volunteer" name={vol.user_id?.name || vol.district} focus={vol.skills?.join(", ") || ""} logo={vol.profile_picture} />
+          ))}
+        </View>
+        <TouchableOpacity style={styles.exploreBtn}><Text style={styles.exploreText}>🌎 Explore More Opportunities</Text></TouchableOpacity>
+      </ScrollView>
+      <ManagerNavBar />
+    </View>
   );
 }
 
