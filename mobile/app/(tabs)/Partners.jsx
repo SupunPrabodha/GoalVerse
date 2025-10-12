@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Image } from "react-native";
+import { useRouter } from "expo-router";
 import ManagerNavBar from "../../components/ManagerNavBar";
 const API_BASE = "http://172.20.10.3:4000/api/partners"; 
 
@@ -73,13 +74,26 @@ export default function Partners() {
   );
 }
 
-function PartnerCard({ type, name, focus, logo }) {
+function PartnerCard({ type, name, focus, logo, ...partner }) {
+  const router = useRouter();
   // Ensure logo is absolute URL if it starts with /uploads
   let logoUrl = logo;
   if (logo && logo.startsWith('/uploads')) {
     logoUrl = `http://172.20.10.3:4000${logo}`;
   }
   const [imgError, setImgError] = React.useState(false);
+  const handleRequest = () => {
+    router.push({
+      pathname: "/RequestPartnership",
+      params: {
+        type,
+        name,
+        focus,
+        logo: logoUrl,
+        id: partner._id,
+      },
+    });
+  };
   return (
     <View style={styles.card}>
       <View style={styles.logoBox}>
@@ -93,7 +107,9 @@ function PartnerCard({ type, name, focus, logo }) {
         <Text style={styles.cardTitle}>{name}</Text>
         <Text style={styles.cardType}>{type}</Text>
         {focus ? <Text style={styles.cardFocus}>Focus: {focus}</Text> : null}
-        <TouchableOpacity style={styles.requestBtn}><Text style={styles.requestText}>Request Partnership</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.requestBtn} onPress={handleRequest}>
+          <Text style={styles.requestText}>Request Partnership</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
