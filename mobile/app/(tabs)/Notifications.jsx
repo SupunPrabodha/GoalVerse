@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import SafeScreen from "../../components/SafeScreen";
-import COLORS from "../../constants/colors";
 import { useRouter } from "expo-router";
 import { listReceivedPartnershipRequests } from "../../lib/partners";
 
@@ -37,7 +36,7 @@ export default function Notifications() {
         ) : error ? (
           <Text style={{ color: "red" }}>{error}</Text>
         ) : requests.length === 0 ? (
-          <Text style={{ color: COLORS.textMuted }}>No partnership requests received.</Text>
+          <Text style={{ color: "#6b7280" }}>No partnership requests received.</Text>
         ) : (
           requests.map((req) => (
             <View key={req._id} style={styles.card}>
@@ -66,25 +65,23 @@ export default function Notifications() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: COLORS.bg },
-  title: { fontSize: 22, fontWeight: '800', marginTop: 12, color: COLORS.text },
-  subtitle: { color: COLORS.textMuted, marginTop: 6 },
-  card: { backgroundColor: COLORS.card, borderRadius: 12, padding: 14, marginTop: 12 },
-  cardTitle: { fontWeight: '700', color: COLORS.text },
-  desc: { color: COLORS.textMuted, marginTop: 6 },
-  timeText: { color: COLORS.textMuted, fontSize: 12 },
+  page: { flex: 1, backgroundColor: "#111827" },
+  title: { fontSize: 22, fontWeight: "800", marginTop: 12, color: "#a7eec9ff" },
+  subtitle: { color: "#d1fae5", marginTop: 6 },
+  card: { backgroundColor: "#fff", borderRadius: 12, padding: 14, marginTop: 12 },
+  cardTitle: { fontWeight: "700", color: "#0f172a" },
+  desc: { color: "#6b7280", marginTop: 6 },
+  timeText: { color: "#6b7280", fontSize: 12 },
   viewBtn: {
-    borderWidth: 1,
-    borderColor: '#16a34a',
-    borderRadius: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    alignSelf: 'flex-start',
+    backgroundColor: "#F3F4F6",
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: "center",
     marginTop: 8,
   },
   viewBtnText: {
-    color: '#16a34a',
-    fontWeight: 'bold',
+    color: "#111827",
+    fontWeight: "700",
     fontSize: 15,
   },
 });
