@@ -25,9 +25,11 @@ export default function DonorProfile() {
 	const router = useRouter();
 	const [user, setUser] = useState(null);
 	const [profile, setProfile] = useState(null);
+	const [donationCount, setDonationCount] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [notifEnabled, setNotifEnabled] = useState(true);
 	const [error, setError] = useState(null);
+	const [totalContributed, setTotalContributed] = useState(null);
 
 	useEffect(() => {
 		let mounted = true;
@@ -48,6 +50,8 @@ export default function DonorProfile() {
 				if (res.ok) {
 					const data = await res.json().catch(() => ({}));
 					setProfile(data.profile || data);
+					if (typeof data.donationCount === "number") setDonationCount(data.donationCount);
+					if (typeof data.totalContributed === "number") setTotalContributed(data.totalContributed);
 				} else {
 					const data = await res.json().catch(() => ({}));
 					setError(data.message || "Failed to load donor profile");
@@ -68,7 +72,9 @@ export default function DonorProfile() {
 		router.replace("/(auth)");
 	};
 
-	const donorAvatar = profile?.avatar && getImageUrl(profile.avatar);
+	const donorAvatar = profile?.organization_picture
+		? getImageUrl(profile.organization_picture)
+		: (profile?.avatar && getImageUrl(profile.avatar));
 
 	return (
 		<View style={styles.screen}>
@@ -99,7 +105,11 @@ export default function DonorProfile() {
 						{/* ...existing code... */}
 						<View style={styles.section}>
 							<Text style={styles.sectionTitle}>Total Donations</Text>
-							<Text style={styles.sectionText}>{profile?.total_donations ? `$${profile.total_donations}` : "—"}</Text>
+							<Text style={styles.sectionText}>{donationCount !== null ? donationCount : "—"}</Text>
+						</View>
+						<View style={styles.section}>
+							<Text style={styles.sectionTitle}>Total Contributed</Text>
+							<Text style={styles.sectionText}>{totalContributed !== null ? `$${(totalContributed/100).toFixed(2)}` : "—"}</Text>
 						</View>
 						{/* ...existing code... */}
 						{Array.isArray(profile?.interests) && profile.interests.length > 0 && (
