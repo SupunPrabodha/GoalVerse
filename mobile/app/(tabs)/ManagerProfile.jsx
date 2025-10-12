@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Modal } from "react-native";
 import {
   View,
   Text,
@@ -14,6 +16,7 @@ import ManagerNavBar from "../../components/ManagerNavBar";
 import { useRouter } from "expo-router";
 import { me as fetchMe, getToken, clearToken } from "../../lib/auth";
 import { API_BASE_URL } from "../../lib/api";
+import { translations } from "../constants/translations";
 
 function getImageUrl(path) {
   if (!path) return null;
@@ -29,6 +32,8 @@ export default function ManagerProfile() {
   const [loading, setLoading] = useState(true);
   const [notifEnabled, setNotifEnabled] = useState(true);
   const [error, setError] = useState(null);
+  const [language, setLanguage] = useState("English");
+  const [langModalVisible, setLangModalVisible] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -53,6 +58,9 @@ export default function ManagerProfile() {
           const data = await res.json().catch(() => ({}));
           setError(data.message || "Failed to load org profile");
         }
+        // Load language from AsyncStorage
+        const storedLang = await AsyncStorage.getItem('appLanguage');
+        if (storedLang) setLanguage(storedLang);
       } catch (err) {
         if (!mounted) return;
         setError(err.message || String(err));
@@ -74,8 +82,8 @@ export default function ManagerProfile() {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.header}>Profile & Settings</Text>
-        <Text style={styles.headerSub}>Manage your account preferences and settings</Text>
+  <Text style={styles.header}>{translations[language].profileSettings}</Text>
+  <Text style={styles.headerSub}>{translations[language].managePreferences}</Text>
 
         {loading ? (
           <ActivityIndicator size="large" color="#16a34a" style={{ marginTop: 32 }} />
@@ -117,20 +125,48 @@ export default function ManagerProfile() {
             )}
             {/* ...existing code... */}
             <View style={[styles.settings]}> 
-              <TouchableOpacity style={styles.settingRow} onPress={() => router.push("/(tabs)/Language") }>
-                <View>
-                  <Text style={styles.settingTitle}>Language</Text>
-                  <Text style={styles.settingSub}>Choose your preferred language</Text>
-                </View>
-                <View style={styles.langPill}>
-                  <Text style={styles.langText}>English</Text>
-                  <Ionicons name="checkmark" size={14} color="#16A34A" />
-                </View>
-              </TouchableOpacity>
+                <TouchableOpacity style={styles.settingRow} onPress={() => setLangModalVisible(true)}>
+                  <View>
+                    <Text style={styles.settingTitle}>{translations[language].language}</Text>
+                    <Text style={styles.settingSub}>{translations[language].chooseLanguage}</Text>
+                  </View>
+                  <View style={styles.langPill}>
+                    <Text style={styles.langText}>{language}</Text>
+                    <Ionicons name="chevron-down" size={14} color="#16A34A" />
+                  </View>
+                </TouchableOpacity>
+                <Modal
+                  visible={langModalVisible}
+                  animationType="slide"
+                  transparent
+                  onRequestClose={() => setLangModalVisible(false)}
+                >
+                  <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                      <Text style={styles.modalTitle}>{translations[language].selectLanguage}</Text>
+                      {["English", "Tamil", "Sinhala"].map((lang) => (
+                        <TouchableOpacity
+                          key={lang}
+                          style={[styles.modalOption, language === lang && styles.modalOptionSelected]}
+                          onPress={async () => {
+                            setLanguage(lang);
+                            await AsyncStorage.setItem('appLanguage', lang);
+                            setLangModalVisible(false);
+                          }}
+                        >
+                          <Text style={styles.modalOptionText}>{lang}</Text>
+                        </TouchableOpacity>
+                      ))}
+                      <TouchableOpacity style={styles.modalClose} onPress={() => setLangModalVisible(false)}>
+                        <Text style={styles.modalCloseText}>{translations[language].cancel}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
               <View style={styles.settingRow}>
                 <View>
-                  <Text style={styles.settingTitle}>Notifications</Text>
-                  <Text style={styles.settingSub}>Receive alerts and updates</Text>
+                  <Text style={styles.settingTitle}>{translations[language].notifications}</Text>
+                  <Text style={styles.settingSub}>{translations[language].receiveAlerts}</Text>
                 </View>
                 <Switch value={notifEnabled} onValueChange={setNotifEnabled} />
               </View>
@@ -143,20 +179,20 @@ export default function ManagerProfile() {
               </TouchableOpacity>
               <TouchableOpacity style={styles.settingRow} onPress={() => router.push("/(tabs)/HelpSupport") }>
                 <View>
-                  <Text style={styles.settingTitle}>Help & Support</Text>
-                  <Text style={styles.settingSub}>Get assistance and contact support</Text>
+                  <Text style={styles.settingTitle}>{translations[language].helpSupport}</Text>
+                  <Text style={styles.settingSub}>{translations[language].getAssistance}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.settingRow} onPress={onLogout}>
                 <View>
-                  <Text style={[styles.settingTitle, { color: "#DC2626" }]}>Logout</Text>
-                  <Text style={styles.settingSub}>Sign out of your account</Text>
+                  <Text style={[styles.settingTitle, { color: "#DC2626" }]}>{translations[language].logout}</Text>
+                  <Text style={styles.settingSub}>{translations[language].signOut}</Text>
                 </View>
                 <Ionicons name="log-out-outline" size={18} color="#DC2626" />
               </TouchableOpacity>
             </View>
-            <Text style={styles.version}>Version 1.2.0 • © 2025 GoalVerse</Text>
+            <Text style={styles.version}>{translations[language].version}</Text>
           </View>
         )}
         {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -167,6 +203,58 @@ export default function ManagerProfile() {
 }
 
 const styles = StyleSheet.create({
+// ...existing code...
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    width: 280,
+    alignItems: 'center',
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 18,
+    color: '#111827',
+  },
+  modalOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 10,
+    marginBottom: 8,
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+  },
+  modalOptionSelected: {
+    backgroundColor: '#E6F9EF',
+  },
+  modalOptionText: {
+    fontSize: 16,
+    color: '#065F46',
+    fontWeight: '700',
+  },
+  modalClose: {
+    marginTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 10,
+    backgroundColor: '#F87171',
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalCloseText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 15,
+  },
   screen: { flex: 1, backgroundColor: "#F9FAFB" },
   container: { padding: 20, paddingBottom: 120 },
   header: { color: "#111827", fontSize: 18, fontWeight: "800", marginBottom: 6 },

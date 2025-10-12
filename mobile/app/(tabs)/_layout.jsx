@@ -21,6 +21,7 @@ export default function TabsLayout() {
       <Stack.Screen name="AllProjects" options={{ title: "All Projects" }} />
       <Stack.Screen name="DonorDonate" options={{ title: "Donate" }} />
       <Stack.Screen name="RequestPartnership" options={{ title: "Request Partnership" }} />
+      <Stack.Screen name="HelpSupport" options={{ title: "Help & Support" }} />
     </Stack>
   )
 }
