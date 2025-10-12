@@ -10,11 +10,11 @@ import cookieParser from "cookie-parser";
 
 import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.routes.js";
-
 import ngoRoutes from "./routes/ngo.routes.js";
 import projectRoutes from "./routes/project.routes.js"; 
 import publicRoutes from "./routes/public.routes.js";
 import donationRoutes from "./routes/donation.routes.js";
+import volunteerRoutes from "./routes/volunteer.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);                
 const __dirname = path.dirname(__filename);  
@@ -49,6 +49,7 @@ app.use("/api/ngo", ngoRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/public", publicRoutes); 
 app.use("/api/donations", donationRoutes);
+app.use("/api/volunteer", volunteerRoutes);
 
 // Start
 const PORT = process.env.PORT || 4000;
