@@ -1,4 +1,3 @@
-// src/controllers/volunteer.controller.js
 import VolunteerProfile from "../models/VolunteerProfile.js";
 import User from "../models/User.js";
 

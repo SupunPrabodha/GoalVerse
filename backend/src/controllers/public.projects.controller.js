@@ -1,4 +1,3 @@
-// ESM
 import Project from "../models/Project.js";
 import NGOManagerProfile from "../models/NGOManagerProfile.js";
 

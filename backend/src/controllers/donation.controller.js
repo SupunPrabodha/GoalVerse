@@ -1,4 +1,3 @@
-// backend/src/controllers/donation.controller.js
 import Donation from '../models/Donation.js';
 import Project from '../models/Project.js';
 
