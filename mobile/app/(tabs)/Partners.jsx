@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Image } from "react-native";
 import ManagerNavBar from "../../components/ManagerNavBar";
 const API_BASE = "http://172.20.10.3:4000/api/partners"; 
 
@@ -67,16 +67,29 @@ export default function Partners() {
             <PartnerCard key={vol._id} type="Volunteer" name={vol.user_id?.fullName} focus={vol.skills?.join(", ") || ""} logo={vol.profile_picture} />
           ))}
         </View>
-        </ScrollView>
+        <TouchableOpacity style={styles.exploreBtn}><Text style={styles.exploreText}>🌎 Explore More Opportunities</Text></TouchableOpacity>
+      </ScrollView>
       <ManagerNavBar />
     </View>
   );
 }
 
 function PartnerCard({ type, name, focus, logo }) {
+  // Ensure logo is absolute URL if it starts with /uploads
+  let logoUrl = logo;
+  if (logo && logo.startsWith('/uploads')) {
+    logoUrl = `http://172.20.10.3:4000${logo}`;
+  }
+  const [imgError, setImgError] = React.useState(false);
   return (
     <View style={styles.card}>
-      <View style={styles.logoBox}><Text style={styles.logoText}>{name?.slice(0, 2).toUpperCase()}</Text></View>
+      <View style={styles.logoBox}>
+        {logoUrl && !imgError ? (
+          <Image source={{ uri: logoUrl }} style={styles.logoImg} onError={() => setImgError(true)} />
+        ) : (
+          <Text style={styles.logoText}>{name?.slice(0, 2).toUpperCase()}</Text>
+        )}
+      </View>
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{name}</Text>
         <Text style={styles.cardType}>{type}</Text>
@@ -97,8 +110,9 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: "bold", color: "#222", marginBottom: 8 },
   empty: { color: "#888", fontStyle: "italic", marginBottom: 8 },
   card: { flexDirection: "row", backgroundColor: "#fff", borderRadius: 12, padding: 12, marginBottom: 10, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 4, elevation: 2, alignItems: "center" },
-  logoBox: { width: 48, height: 48, borderRadius: 12, backgroundColor: "#d1fae5", justifyContent: "center", alignItems: "center", marginRight: 12 },
+  logoBox: { width: 48, height: 48, borderRadius: 12, backgroundColor: "#d1fae5", justifyContent: "center", alignItems: "center", marginRight: 12, overflow: "hidden" },
   logoText: { fontSize: 20, fontWeight: "bold", color: "#16a34a" },
+  logoImg: { width: 48, height: 48, borderRadius: 12, resizeMode: "cover" },
   cardContent: { flex: 1 },
   cardTitle: { fontSize: 16, fontWeight: "bold", color: "#222" },
   cardType: { fontSize: 12, color: "#2563eb", marginBottom: 2 },
