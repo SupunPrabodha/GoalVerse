@@ -11,6 +11,8 @@ export default function Tabs_layout() {
       <Stack.Screen name="ProjectList" options={{ title: "Projects" }} />
       <Stack.Screen name="ProjectUpdate/[id]" options={{ title: "Update Project" }} />
         {/* test end here */}
+      <Stack.Screen name="OrgProjects/[orgId]" options={{ title: "Projects" }} />
+      <Stack.Screen name="ProjectDetails/[id]" options={{ title: "Project Details" }} />
 
     </Stack>
 }
