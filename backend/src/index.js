@@ -23,7 +23,7 @@ dotenv.config({ path: path.join(__dirname, "./.env") });
 
 // Optional: fail fast if missing
 if (!process.env.MONGODB_URI) {                                   // 🆕
-  console.error("❌ MONGODB_URI is missing. Check backend/.env"); // 🆕
+  console.error(" MONGODB_URI is missing. Check backend/.env"); // 🆕
   process.exit(1);                                                // 🆕
 }
 
@@ -53,6 +53,8 @@ app.use("/api/donor", donorRoutes);
 app.use("/api/partners", partnersRoutes);
 
 // Start
-const PORT = process.env.PORT || 4000;
+// const PORT = process.env.PORT || 4000;
 await connectDB(process.env.MONGODB_URI);
-app.listen(PORT, () => console.log(`API listening on http://localhost:${PORT}`));
+// app.listen(PORT, () => console.log(`API listening on http://localhost:${PORT}`));
+
+module.exports = app; // export for testing
