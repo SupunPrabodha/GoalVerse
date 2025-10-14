@@ -1,23 +1,25 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "GoalVerse",
+    "slug": "goalverse",
     "version": "1.0.0",
     "orientation": "portrait",
-  "icon": "./assets/images/logo.png",
-    "scheme": "mobile",
+    "icon": "./assets/images/logo.png",
+    "scheme": "goalverse",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourname.goalverse"
     },
     "android": {
+      "package": "com.yourname.goalverse",
+      "versionCode": 1,
+      "permissions": [],
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
+        "foregroundImage": "./assets/images/logo.png",
+        "backgroundColor": "#E6F4FE"
+    },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -44,6 +46,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b9feb15a-9566-47ff-a7ca-6d4b2e90ce90"
+      }
+    },
+    "owner": "dishang98"
   }
 }
