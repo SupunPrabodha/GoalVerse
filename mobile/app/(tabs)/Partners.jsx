@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
 import ManagerNavBar from "../../components/ManagerNavBar";
-const API_BASE = "http://172.20.10.3:4000/api/partners"; 
+import { API_BASE_URL } from "../../lib/api";
+const API_BASE = `${API_BASE_URL}/partners`;
 
 export default function Partners() {
   const [ngos, setNgos] = useState([]);
@@ -50,22 +51,22 @@ export default function Partners() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>NGOs</Text>
           {ngos.length === 0 && <Text style={styles.empty}>No NGOs found.</Text>}
-          {ngos.map((ngo) => (
-            <PartnerCard key={ngo._id} type="NGO" name={ngo.organization_name} focus={ngo.address} logo={ngo.organization_logo} {...ngo} />
-          ))}
+            {ngos.map((ngo) => (
+              <PartnerCard key={ngo._id} type="NGO" name={ngo.organization_name} focus={ngo.address} logo={ngo.organization_logo} {...ngo} />
+            ))}
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Donors</Text>
           {donors.length === 0 && <Text style={styles.empty}>No donors found.</Text>}
-          {donors.map((donor) => (
-            <PartnerCard key={donor._id} type="Donor" name={donor.organization_name || donor.country} focus={donor.funding_focus} logo={donor.organization_picture} {...donor} />
-          ))}
+            {donors.map((donor) => (
+              <PartnerCard key={donor._id} type="Donor" name={donor.organization_name} focus={donor.country} logo={donor.organization_picture} {...donor} />
+            ))}
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Volunteers</Text>
           {volunteers.length === 0 && <Text style={styles.empty}>No volunteers found.</Text>}
           {volunteers.map((vol) => (
-            <PartnerCard key={vol._id} type="Volunteer" name={vol.user_id?.fullName} focus={vol.skills?.join(", ") || ""} logo={vol.profile_picture} {...vol} />
+            <PartnerCard key={vol._id} type="Volunteer" name={vol.user_id?.fullName} focus={Array.isArray(vol.skills) ? vol.skills.join(", ") : vol.skills} logo={vol.profile_picture} {...vol} />
           ))}
         </View>
       </ScrollView>
@@ -79,7 +80,7 @@ function PartnerCard({ type, name, focus, logo, ...partner }) {
   // Ensure logo is absolute URL if it starts with /uploads
   let logoUrl = logo;
   if (logo && logo.startsWith('/uploads')) {
-    logoUrl = `http://172.20.10.3:4000${logo}`;
+    logoUrl = API_BASE_URL.replace(/\/api$/, "") + logo;
   }
   const [imgError, setImgError] = React.useState(false);
   const handleRequest = () => {

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList }
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { listMyProjects } from "../../lib/projects";
 import { getToken } from "../../lib/auth";
+import { API_BASE_URL } from "../../lib/api";
 
 export default function RequestPartnership() {
   const router = useRouter();
@@ -40,8 +41,9 @@ export default function RequestPartnership() {
     setSuccess("");
     try {
       const token = await getToken();
+      console.log('Current token:', token);
       if (!token) throw new Error("No authentication token found");
-      const response = await fetch("http://172.20.10.3:4000/api/partners/request", {
+      const response = await fetch(`${API_BASE_URL}/partners/request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +59,15 @@ export default function RequestPartnership() {
       setSuccess("Request sent successfully!");
       router.push("/(tabs)/Partners");
     } catch (err) {
-      setError("Failed to send request");
+      let errorMsg = "Failed to send request";
+      if (err.response) {
+        // If using axios, err.response.data; for fetch, try to parse response
+        errorMsg += ": " + JSON.stringify(err.response.data || err.response.statusText);
+      } else if (err.message) {
+        errorMsg += ": " + err.message;
+      }
+      console.log('Request error:', err);
+      setError(errorMsg);
     } finally {
       setSending(false);
     }
