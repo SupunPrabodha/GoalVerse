@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import BudgetVsActualChart from "../../../components/BudgetVsActualChart"; 
 import DonutCostPerBeneficiary from "../../../components/DonutCostPerBeneficiary";
 import ExpenseCategoriesCard from "../../../components/ExpenseCategoriesCard";
+import AISummarySection from "../../../components/AISummarySection";
 
 
 const SDG_COLORS = ["#e5243b","#DDA63A","#4C9F38","#C5192D","#FF3A21","#26BDE2","#FCC30B",
@@ -123,54 +124,63 @@ export default function ProjectDetails() {
           <Text style={s.primaryText}>See Statistics</Text>
         </TouchableOpacity> */}
 
+
         <TouchableOpacity
-            style={s.primaryBtn}
-            onPress={() => setShowStats((v) => !v)}   // 🆕
+          style={s.primaryBtn}
+          onPress={() => setShowStats((v) => !v)}
         >
-            <Ionicons name="bar-chart-outline" size={18} color="#fff" />
-            <Text style={s.primaryText}>{showStats ? "Hide Statistics" : "See Statistics"}</Text>
+          <Ionicons name="bar-chart-outline" size={18} color="#fff" />
+          <Text style={s.primaryText}>{showStats ? "Hide Statistics" : "See Statistics"}</Text>
         </TouchableOpacity>
 
-        {/* 🆕 Statistics section */}
+        {/* Ensure statistics content renders immediately under its button */}
         {showStats && (
-            <View style={s.card}>
-                <Text style={s.sectionTitle}>Budget vs Actual</Text>
-                {chartData.length > 0 ? (
-                <BudgetVsActualChart
-                    data={chartData}
-                    currency="$"
-                    title="Budget vs Actual"
-                    subtitle="Comparison of planned budget against actual expenditures"
-                />
-                ) : (
-                <Text style={{ color: "#6b7280" }}>No expense data for this project.</Text>
-                )}
+          <View style={s.card}>
+            <Text style={s.sectionTitle}>Budget vs Actual</Text>
+            {chartData.length > 0 ? (
+              <BudgetVsActualChart
+                data={chartData}
+                currency="$"
+                title="Budget vs Actual"
+                subtitle="Comparison of planned budget against actual expenditures"
+              />
+            ) : (
+              <Text style={{ color: "#6b7280" }}>No expense data for this project.</Text>
+            )}
 
-                            {/* 🟢 ADDED: Donut in the same toggle section */}
-                <View style={{ height: 14 }} />
-                <Text style={s.sectionTitle}>Cost per Beneficiary Breakdown</Text>
-                {donutRows.length > 0 ? (
-                  <DonutCostPerBeneficiary
-                    data={donutRows}
-                    currency="$"
-                    metric={donutMetric}  // "cpb" if beneficiaries per category exist; otherwise "actual"
-                    title="Cost per Beneficiary Breakdown"
-                    subtitle="Distribution of beneficiary-related costs"
-                  />
-                ) : (
-                  <Text style={{ color: "#6b7280" }}>No expense data for this project.</Text>
-                )}
+            {/* Donut */}
+            <View style={{ height: 14 }} />
+            <Text style={s.sectionTitle}>Cost per Beneficiary Breakdown</Text>
+            {donutRows.length > 0 ? (
+              <DonutCostPerBeneficiary
+                data={donutRows}
+                currency="$"
+                metric={donutMetric}
+                title="Cost per Beneficiary Breakdown"
+                subtitle="Distribution of beneficiary-related costs"
+              />
+            ) : (
+              <Text style={{ color: "#6b7280" }}>No expense data for this project.</Text>
+            )}
 
-                {/* 🆕 Expense categories with actual costs */}
-           <View style={{ height: 14 }} />
-           <ExpenseCategoriesCard
-             title="Expense Categories"
-             categories={(p?.expenses || []).map(e => ({ name: e.name, actual: e.actual }))}
-             currency={p?.budget?.currency || "$"}
-             onReportPress={() => console.log("Open expense reports for", p?._id)}
-           />
-            </View>
+            {/* Expense categories */}
+            <View style={{ height: 14 }} />
+            <ExpenseCategoriesCard
+              title="Expense Categories"
+              categories={(p?.expenses || []).map(e => ({ name: e.name, actual: e.actual }))}
+              currency={p?.budget?.currency || "$"}
+              onReportPress={() => console.log("Open expense reports for", p?._id)}
+            />
+          </View>
         )}
+
+        {/* AI Summary reusable section appears after statistics block */}
+        <AISummarySection projectId={p._id} />
+
+
+        {/* moved statistics section above */}
+
+        {/* AI Summary section is now handled by AISummarySection above */}
 
         <TouchableOpacity style={s.secondaryBtn}>
           <Text style={s.secondaryText}>Volunteer to this Project</Text>

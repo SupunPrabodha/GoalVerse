@@ -25,6 +25,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, SafeAreaView, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { me, getToken } from "../lib/auth"; // uses your existing helpers
+// import { API_BASE_URL } from "@/lib/api";
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -37,6 +38,10 @@ export default function SplashScreen() {
   }, []);
 
   useEffect(() => {
+    fetch(`https://10.76.39.164/api/health`)
+      .then(res => res.text())
+      .then(text => console.log("✅ Backend response:", text))
+      .catch(err => console.log("❌ Connection failed:", err));
     (async () => {
       try {
         // tiny delay so the splash is visible
