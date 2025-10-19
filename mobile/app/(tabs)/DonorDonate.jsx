@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, FlatList, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import SafeScreen from '../../components/SafeScreen';
 import { createDonation, listMyDonations } from '../../lib/donations';
@@ -51,38 +51,40 @@ export default function DonorDonate() {
   return (
     <SafeScreen>
       <View style={styles.page}>
-        <Text style={styles.title}>Make a Donation</Text>
-        <View style={styles.card}>
-          <Text style={styles.label}>Select Project</Text>
-          <View style={{ marginTop: 8 }}>
-            {projects.length === 0 && <Text style={{ color:'#6b7280' }}>No active projects available. Please try again later.</Text>}
-            {projects.map((p) => (
-              <TouchableOpacity key={p._id} style={[styles.optionRow, selectedProjectId === p._id && styles.optionSelected]} onPress={() => setSelectedProjectId(p._id)}>
-                <View style={{ flex:1 }}>
-                  <Text style={{ fontWeight:'700', color:'#0f172a' }}>{p.name}</Text>
-                  <Text style={{ color:'#6b7280', marginTop:4 }}>{p.category}</Text>
-                </View>
-                {selectedProjectId === p._id ? <Ionicons name="radio-button-on" size={22} color="#16a34a"/> : <Ionicons name="radio-button-off" size={22} color="#9ca3af"/>}
-              </TouchableOpacity>
-            ))}
+        <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+          <Text style={styles.title}>Make a Donation</Text>
+          <View style={styles.card}>
+            <Text style={styles.label}>Select Project</Text>
+            <View style={{ marginTop: 8 }}>
+              {projects.length === 0 && <Text style={{ color:'#6b7280' }}>No active projects available. Please try again later.</Text>}
+              {projects.map((p) => (
+                <TouchableOpacity key={p._id} style={[styles.optionRow, selectedProjectId === p._id && styles.optionSelected]} onPress={() => setSelectedProjectId(p._id)}>
+                  <View style={{ flex:1 }}>
+                    <Text style={{ fontWeight:'700', color:'#0f172a' }}>{p.name}</Text>
+                    <Text style={{ color:'#6b7280', marginTop:4 }}>{p.category}</Text>
+                  </View>
+                  {selectedProjectId === p._id ? <Ionicons name="radio-button-on" size={22} color="#16a34a"/> : <Ionicons name="radio-button-off" size={22} color="#9ca3af"/>}
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.label}>Amount (USD)</Text>
+            <TextInput value={amount} onChangeText={setAmount} keyboardType="decimal-pad" placeholder="50.00" style={styles.input} />
+            <Text style={styles.label}>Note</Text>
+            <TextInput value={note} onChangeText={setNote} placeholder="Optional message" style={[styles.input, { height: 80 }]} multiline />
+            <TouchableOpacity style={[styles.primaryBtn, submitting && { opacity: 0.6 }]} disabled={submitting} onPress={submit}>
+              <Text style={{ color: '#fff', fontWeight: '700' }}>Donate</Text>
+            </TouchableOpacity>
           </View>
 
-          <Text style={styles.label}>Amount (USD)</Text>
-          <TextInput value={amount} onChangeText={setAmount} keyboardType="decimal-pad" placeholder="50.00" style={styles.input} />
-          <Text style={styles.label}>Note</Text>
-          <TextInput value={note} onChangeText={setNote} placeholder="Optional message" style={[styles.input, { height: 80 }]} multiline />
-          <TouchableOpacity style={[styles.primaryBtn, submitting && { opacity: 0.6 }]} disabled={submitting} onPress={submit}>
-            <Text style={{ color: '#fff', fontWeight: '700' }}>Donate</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={[styles.title, { marginTop: 16 }]}>My Donations</Text>
-        <FlatList data={items} keyExtractor={(i) => i._id} contentContainerStyle={{ paddingBottom: 120 }} renderItem={({item}) => (
-          <View style={styles.row}>
-            <Text style={{ fontWeight:'700' }}>${(item.amountCents/100).toFixed(2)}</Text>
-            <Text style={{ color:'#6b7280' }}>{new Date(item.createdAt).toLocaleDateString()}</Text>
-          </View>
-        )} />
+          <Text style={[styles.title, { marginTop: 16 }]}>My Donations</Text>
+          {items.map((item) => (
+            <View style={styles.row} key={item._id}>
+              <Text style={{ fontWeight:'700' }}>${(item.amountCents/100).toFixed(2)}</Text>
+              <Text style={{ color:'#6b7280' }}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+            </View>
+          ))}
+        </ScrollView>
       </View>
       <DonorNavBar />
     </SafeScreen>
