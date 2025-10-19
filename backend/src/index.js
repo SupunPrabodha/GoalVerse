@@ -1,6 +1,5 @@
 // ESM entry
 import dotenv from "dotenv";
-//dotenv.config();
 import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
@@ -15,11 +14,13 @@ import donationRoutes from "./routes/donation.routes.js";
 import volunteerRoutes from "./routes/volunteer.routes.js";
 import donorRoutes from "./routes/donor.routes.js";
 import partnersRoutes from "./routes/partners.routes.js";
+import aiRoutes from "./routes/ai.routes.js";  
 
 const __filename = fileURLToPath(import.meta.url);                
 const __dirname = path.dirname(__filename);  
 
-dotenv.config({ path: path.join(__dirname, "./.env") });
+// Ensure env vars are loaded no matter where node is run from
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 // Optional: fail fast if missing
 if (!process.env.MONGODB_URI) {                                   // 🆕
@@ -51,6 +52,9 @@ app.use("/api/donations", donationRoutes);
 app.use("/api/volunteer", volunteerRoutes);
 app.use("/api/donor", donorRoutes);
 app.use("/api/partners", partnersRoutes);
+app.use("/api/ai", aiRoutes);                  // 🆕
+app.get('/health', (req, res) => res.send('Backend connected!'));
+
 
 // Start
 const PORT = process.env.PORT || 4000;

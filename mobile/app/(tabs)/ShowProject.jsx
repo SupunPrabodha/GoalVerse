@@ -11,6 +11,7 @@ import { fetchPublicProject } from "../../lib/public";
 import BudgetVsActualChart from "../../components/BudgetVsActualChart";
 import DonutCostPerBeneficiary from "../../components/DonutCostPerBeneficiary";
 import ExpenseCategoriesCard from "../../components/ExpenseCategoriesCard";
+import AISummarySection from "../../components/AISummarySection";
 
 const SDG_COLORS = [
   "#e5243b","#DDA63A","#4C9F38","#C5192D","#FF3A21","#26BDE2","#FCC30B",
@@ -183,6 +184,9 @@ export default function ShowProject() {
             />
           </View>
         )}
+
+        {/* AI Summary section placed after statistics block */}
+        <AISummarySection projectId={p._id} />
       </ScrollView>
     </SafeAreaView>
   );

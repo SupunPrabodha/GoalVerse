@@ -1,5 +1,6 @@
 import Project, { PROJECT_STATUSES } from "../models/Project.js";
 import NGOManagerProfile from "../models/NGOManagerProfile.js";
+// import AISummary from "../models/AISummary.js";
 
 const STATUS_MAP = {
   "On-going": "ON_GOING",
@@ -87,6 +88,7 @@ export async function createProject(req, res) {
       target_beneficiaries: target_beneficiaries != null ? Number(target_beneficiaries) : undefined,
       achieved_beneficiaries: achieved_beneficiaries != null ? Number(achieved_beneficiaries) : undefined,
     });
+    // await AISummary.deleteMany({ key: { $in: [`project:${doc._id}`, `org:${doc.organization}`]}});
 
     return res.status(201).json({ project: doc });
   } catch (err) {
@@ -148,6 +150,7 @@ export async function updateMyProject(req, res) {
       doc.achieved_beneficiaries = Number(body.achieved_beneficiaries);
 
     await doc.save(); // triggers your pre-save validations
+    // await AISummary.deleteMany({ key: { $in: [`project:${doc._id}`, `org:${doc.organization}`]}});
     return res.json({ project: doc });
   } catch (err) {
     return res.status(400).json({ message: err.message || "Failed to update project" });
