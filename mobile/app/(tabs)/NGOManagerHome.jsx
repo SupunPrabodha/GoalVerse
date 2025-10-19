@@ -15,6 +15,7 @@ import ManagerNavBar from "../../components/ManagerNavBar";
 import { me } from "../../lib/auth";                   // current user
 import { listMyProjects } from "../../lib/projects";   // all projects I own / my org
 import BudgetBreakdownCard from "../../components/BudgetBreakdownCard"; // you already created this
+import BudgetUtilizationTrend from "../../components/BudgetUtilizationTrend";
 
 export default function NGOManagerHome() {
   const router = useRouter();
@@ -119,7 +120,7 @@ export default function NGOManagerHome() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#111827" }}>
-      <ScrollView contentContainerStyle={{ padding: 14 }}>
+      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 140 }}>
         {/* Header bar */}
         <View style={s.header}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -185,6 +186,11 @@ export default function NGOManagerHome() {
         {/* Budget Breakdown (aggregated) */}
         <View style={s.cardWrap}>
           <BudgetBreakdownCard project={syntheticProject} />
+        </View>
+
+        {/* 🆕 Budget Utilization Trend (time series) */}
+        <View style={s.cardWrap}>
+          <BudgetUtilizationTrend projects={projects} />
         </View>
       </ScrollView>
       <ManagerNavBar />
